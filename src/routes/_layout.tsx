@@ -1,6 +1,5 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 
-import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 
 export const Route = createFileRoute("/_layout")({
@@ -9,12 +8,11 @@ export const Route = createFileRoute("/_layout")({
 
 function RouteComponent() {
 	return (
-		<div className="overflow-hidden">
+		<div className="overflow-x-hidden max-container">
 			<Header />
 			<main>
 				<Outlet />
 			</main>
-			<Footer />
 		</div>
 	);
 }
