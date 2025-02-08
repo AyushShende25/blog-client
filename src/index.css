@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 @layer base {
- :root {
-		--background:0 0% 98%;
+	:root {
+		--background: 0 0% 98%;
 		--foreground: 0 0% 3.9%;
 		--card: 0 0% 100%;
 		--card-foreground: 0 0% 3.9%;
@@ -55,7 +55,7 @@
 		--chart-3: 30 80% 55%;
 		--chart-4: 280 65% 60%;
 		--chart-5: 340 75% 55%;
-	} 
+	}
 }
 @layer base {
 	* {
@@ -73,7 +73,7 @@
 	.pd-x {
 		@apply px-6 md:px-10 lg:px-20;
 	}
-	
+
 	.pd-y {
 		@apply py-6 md:py-10;
 	}
