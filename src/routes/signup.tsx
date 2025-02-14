@@ -1,6 +1,12 @@
 import { useForm } from '@tanstack/react-form';
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
+import {
+  Link,
+  createFileRoute,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router';
 import { z } from 'zod';
+import { fallback, zodValidator } from '@tanstack/zod-adapter';
 
 import { authApi } from '@/api/authApi';
 import FieldInfo from '@/components/FieldInfo';
@@ -16,9 +22,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { ApiErrorResponse } from '@/constants/types';
 import { AxiosError } from 'axios';
+import { userQueryOptions } from '@/hooks/useUser';
+
+const signupSearchSchema = z.object({
+  redirect: fallback(z.string(), '/').default('/'),
+});
 
 export const Route = createFileRoute('/signup')({
-  component: RouteComponent,
+  component: SignupComponent,
+  validateSearch: zodValidator(signupSearchSchema),
+  beforeLoad: async ({ context, search }) => {
+    const user = await context.queryClient.ensureQueryData(userQueryOptions());
+    if (user) {
+      throw redirect({ to: search.redirect });
+    }
+  },
 });
 
 export const signupSchema = z.object({
@@ -32,7 +50,7 @@ export const signupSchema = z.object({
 });
 export type SignupInput = z.infer<typeof signupSchema>;
 
-function RouteComponent() {
+function SignupComponent() {
   const navigate = useNavigate();
 
   const form = useForm({
@@ -46,8 +64,8 @@ function RouteComponent() {
     },
     onSubmit: async ({ value }) => {
       try {
-        const res = await authApi.signup(value);
-        await navigate({ to: '/login' });
+        await authApi.signup(value);
+        await navigate({ to: '/verify-email' });
         return null;
       } catch (error) {
         if (error instanceof AxiosError && error.response?.data) {

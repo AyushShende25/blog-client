@@ -1,8 +1,15 @@
 import { useForm } from '@tanstack/react-form';
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
+import {
+  Link,
+  createFileRoute,
+  redirect,
+  useNavigate,
+  useRouter,
+} from '@tanstack/react-router';
 import { z } from 'zod';
 import { fallback, zodValidator } from '@tanstack/zod-adapter';
 import { AxiosError } from 'axios';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { authApi } from '@/api/authApi';
 import FieldInfo from '@/components/FieldInfo';
@@ -17,6 +24,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { ApiErrorResponse } from '@/constants/types';
+import { userQueryOptions } from '@/hooks/useUser';
 
 const loginSearchSchema = z.object({
   redirect: fallback(z.string(), '/').default('/'),
@@ -29,13 +37,21 @@ export const loginSchema = z.object({
 export type LoginInput = z.infer<typeof loginSchema>;
 
 export const Route = createFileRoute('/login')({
-  component: RouteComponent,
+  component: LoginComponent,
   validateSearch: zodValidator(loginSearchSchema),
+  beforeLoad: async ({ context, search }) => {
+    const user = await context.queryClient.ensureQueryData(userQueryOptions());
+    if (user) {
+      throw redirect({ to: search.redirect });
+    }
+  },
 });
 
-function RouteComponent() {
+function LoginComponent() {
   const search = Route.useSearch();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const router = useRouter();
 
   const form = useForm({
     defaultValues: {
@@ -47,7 +63,9 @@ function RouteComponent() {
     },
     onSubmit: async ({ value }) => {
       try {
-        const res = await authApi.login(value);
+        await authApi.login(value);
+        await queryClient.invalidateQueries({ queryKey: ['user'] });
+        router.invalidate();
         await navigate({ to: search.redirect });
         return null;
       } catch (error) {

@@ -1,11 +1,13 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import Logo from './Logo';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import useUser from '@/hooks/useUser';
+import useLogout from '@/hooks/useLogout';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '@/api/authApi';
 
 function Header() {
@@ -25,15 +27,10 @@ function Header() {
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isSearchBannerOpen]);
 
+  const { user } = useUser();
+  // const { logoutMutation } = useLogout();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
-  const { data: user } = useQuery({
-    queryKey: ['user'],
-    queryFn: authApi.getMe,
-    staleTime: Number.POSITIVE_INFINITY,
-    retry: false,
-  });
 
   const { mutate: logoutMutation } = useMutation({
     mutationFn: authApi.logout,
@@ -42,7 +39,6 @@ function Header() {
       navigate({ to: '/login' });
     },
   });
-
   return (
     <header className="pd-x py-6 relative">
       {/* Search Banner */}
@@ -101,7 +97,6 @@ function Header() {
           {user ? (
             <>
               <Button onClick={() => logoutMutation()}>Logout</Button>
-              <p>{user?.username}</p>
             </>
           ) : (
             <Button asChild>

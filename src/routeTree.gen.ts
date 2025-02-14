@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as VerifyEmailImport } from './routes/verify-email'
 import { Route as SignupImport } from './routes/signup'
 import { Route as LoginImport } from './routes/login'
 import { Route as LayoutImport } from './routes/_layout'
@@ -18,6 +19,12 @@ import { Route as LayoutIndexImport } from './routes/_layout/index'
 import { Route as LayoutSearchImport } from './routes/_layout/search'
 
 // Create/Update Routes
+
+const VerifyEmailRoute = VerifyEmailImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const SignupRoute = SignupImport.update({
   id: '/signup',
@@ -73,6 +80,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupImport
       parentRoute: typeof rootRoute
     }
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailImport
+      parentRoute: typeof rootRoute
+    }
     '/_layout/search': {
       id: '/_layout/search'
       path: '/search'
@@ -109,6 +123,7 @@ export interface FileRoutesByFullPath {
   '': typeof LayoutRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/search': typeof LayoutSearchRoute
   '/': typeof LayoutIndexRoute
 }
@@ -116,6 +131,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/search': typeof LayoutSearchRoute
   '/': typeof LayoutIndexRoute
 }
@@ -125,20 +141,22 @@ export interface FileRoutesById {
   '/_layout': typeof LayoutRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/_layout/search': typeof LayoutSearchRoute
   '/_layout/': typeof LayoutIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/login' | '/signup' | '/search' | '/'
+  fullPaths: '' | '/login' | '/signup' | '/verify-email' | '/search' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/signup' | '/search' | '/'
+  to: '/login' | '/signup' | '/verify-email' | '/search' | '/'
   id:
     | '__root__'
     | '/_layout'
     | '/login'
     | '/signup'
+    | '/verify-email'
     | '/_layout/search'
     | '/_layout/'
   fileRoutesById: FileRoutesById
@@ -148,12 +166,14 @@ export interface RootRouteChildren {
   LayoutRoute: typeof LayoutRouteWithChildren
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   LayoutRoute: LayoutRouteWithChildren,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
 }
 
 export const routeTree = rootRoute
@@ -168,7 +188,8 @@ export const routeTree = rootRoute
       "children": [
         "/_layout",
         "/login",
-        "/signup"
+        "/signup",
+        "/verify-email"
       ]
     },
     "/_layout": {
@@ -183,6 +204,9 @@ export const routeTree = rootRoute
     },
     "/signup": {
       "filePath": "signup.tsx"
+    },
+    "/verify-email": {
+      "filePath": "verify-email.tsx"
     },
     "/_layout/search": {
       "filePath": "_layout/search.tsx",
