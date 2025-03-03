@@ -1,8 +1,10 @@
-import { userQueryOptions } from '@/hooks/useUser';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { z } from 'zod';
 import { fallback, zodValidator } from '@tanstack/zod-adapter';
 import { useForm } from '@tanstack/react-form';
+import { AxiosError } from 'axios';
+
+import { userQueryOptions } from '@/hooks/useUser';
 import {
   InputOTP,
   InputOTPGroup,
@@ -11,7 +13,6 @@ import {
 import { Label } from '@/components/ui/label';
 import FieldInfo from '@/components/FieldInfo';
 import { Button } from '@/components/ui/button';
-import { AxiosError } from 'axios';
 import type { ApiErrorResponse } from '@/constants/types';
 import { authApi } from '@/api/authApi';
 
