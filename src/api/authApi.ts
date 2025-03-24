@@ -1,6 +1,6 @@
+import { api } from "@/api/axiosInstance";
 import type { LoginInput } from "@/routes/login";
 import type { SignupInput } from "@/routes/signup";
-import { api } from "@/api/axiosInstance";
 import type { VerifyEmailInput } from "@/routes/verify-email";
 
 export const authApi = {

@@ -1,34 +1,30 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
-import { useInView } from 'react-intersection-observer';
+import { Link, createFileRoute } from '@tanstack/react-router';
 import { useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
 
+import { fetchPostListQueryOptions } from '@/api/postsApi';
+import FeaturedCategories from '@/components/FeaturedCategories';
 import PostCard from '@/components/PostCard';
 import { Button } from '@/components/ui/button';
-import { postsApi } from '@/api/postsApi';
 import type { Post } from '@/constants/types';
-import { Badge } from '@/components/ui/badge';
+import PageSkeleton from '@/components/PageSkeleton';
 
 export const Route = createFileRoute('/_layout/')({
   component: HomeComponent,
+  loader: async ({ context }) => {
+    await context.queryClient.ensureInfiniteQueryData(
+      fetchPostListQueryOptions()
+    );
+  },
+  pendingComponent: () => <PageSkeleton />,
 });
 
 function HomeComponent() {
-  const { ref, inView } = useInView();
-
   const { data, isFetchingNextPage, hasNextPage, fetchNextPage } =
-    useSuspenseInfiniteQuery({
-      queryKey: ['posts'],
-      queryFn: postsApi.fetchPostList,
-      initialPageParam: 1,
-      getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-        if (lastPageParam >= lastPage.meta.totalPages) {
-          return undefined;
-        }
-        return lastPageParam + 1;
-      },
-    });
+    useSuspenseInfiniteQuery(fetchPostListQueryOptions());
 
+  const { ref, inView } = useInView();
   useEffect(() => {
     if (inView) {
       fetchNextPage();
@@ -52,30 +48,9 @@ function HomeComponent() {
         <span>and get Inspired!</span>
       </p>
       <div className="h-1 bg-foreground w-full my-10" />
+
       <section>
-        <div className="mb-8 space-x-4 md:space-x-6 rounded-lg">
-          <Badge className="text-lg mb-3 cursor-pointer" variant="secondary">
-            All Posts
-          </Badge>
-          <Badge className="text-lg mb-3 cursor-pointer" variant="outline">
-            Food
-          </Badge>
-          <Badge className="text-lg mb-3 cursor-pointer" variant="outline">
-            Lifestyle
-          </Badge>
-          <Badge className="text-lg mb-3 cursor-pointer" variant="outline">
-            Health
-          </Badge>
-          <Badge className="text-lg mb-3 cursor-pointer" variant="outline">
-            Technology
-          </Badge>
-          <Badge className="text-lg mb-3 cursor-pointer" variant="outline">
-            Travel
-          </Badge>
-          <Badge className="text-lg mb-3 cursor-pointer" variant="outline">
-            Artist
-          </Badge>
-        </div>
+        <FeaturedCategories />
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {data?.pages.map((page) => {
             return page.data.map((item: Post) => (

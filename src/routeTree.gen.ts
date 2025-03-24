@@ -17,6 +17,7 @@ import { Route as LoginImport } from './routes/login'
 import { Route as LayoutImport } from './routes/_layout'
 import { Route as LayoutIndexImport } from './routes/_layout/index'
 import { Route as LayoutSearchImport } from './routes/_layout/search'
+import { Route as LayoutPostPostSlugImport } from './routes/_layout/post/$postSlug'
 
 // Create/Update Routes
 
@@ -52,6 +53,12 @@ const LayoutIndexRoute = LayoutIndexImport.update({
 const LayoutSearchRoute = LayoutSearchImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
+const LayoutPostPostSlugRoute = LayoutPostPostSlugImport.update({
+  id: '/post/$postSlug',
+  path: '/post/$postSlug',
   getParentRoute: () => LayoutRoute,
 } as any)
 
@@ -101,6 +108,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutIndexImport
       parentRoute: typeof LayoutImport
     }
+    '/_layout/post/$postSlug': {
+      id: '/_layout/post/$postSlug'
+      path: '/post/$postSlug'
+      fullPath: '/post/$postSlug'
+      preLoaderRoute: typeof LayoutPostPostSlugImport
+      parentRoute: typeof LayoutImport
+    }
   }
 }
 
@@ -109,11 +123,13 @@ declare module '@tanstack/react-router' {
 interface LayoutRouteChildren {
   LayoutSearchRoute: typeof LayoutSearchRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
+  LayoutPostPostSlugRoute: typeof LayoutPostPostSlugRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutSearchRoute: LayoutSearchRoute,
   LayoutIndexRoute: LayoutIndexRoute,
+  LayoutPostPostSlugRoute: LayoutPostPostSlugRoute,
 }
 
 const LayoutRouteWithChildren =
@@ -126,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof VerifyEmailRoute
   '/search': typeof LayoutSearchRoute
   '/': typeof LayoutIndexRoute
+  '/post/$postSlug': typeof LayoutPostPostSlugRoute
 }
 
 export interface FileRoutesByTo {
@@ -134,6 +151,7 @@ export interface FileRoutesByTo {
   '/verify-email': typeof VerifyEmailRoute
   '/search': typeof LayoutSearchRoute
   '/': typeof LayoutIndexRoute
+  '/post/$postSlug': typeof LayoutPostPostSlugRoute
 }
 
 export interface FileRoutesById {
@@ -144,13 +162,27 @@ export interface FileRoutesById {
   '/verify-email': typeof VerifyEmailRoute
   '/_layout/search': typeof LayoutSearchRoute
   '/_layout/': typeof LayoutIndexRoute
+  '/_layout/post/$postSlug': typeof LayoutPostPostSlugRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/login' | '/signup' | '/verify-email' | '/search' | '/'
+  fullPaths:
+    | ''
+    | '/login'
+    | '/signup'
+    | '/verify-email'
+    | '/search'
+    | '/'
+    | '/post/$postSlug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/signup' | '/verify-email' | '/search' | '/'
+  to:
+    | '/login'
+    | '/signup'
+    | '/verify-email'
+    | '/search'
+    | '/'
+    | '/post/$postSlug'
   id:
     | '__root__'
     | '/_layout'
@@ -159,6 +191,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/_layout/search'
     | '/_layout/'
+    | '/_layout/post/$postSlug'
   fileRoutesById: FileRoutesById
 }
 
@@ -196,7 +229,8 @@ export const routeTree = rootRoute
       "filePath": "_layout.tsx",
       "children": [
         "/_layout/search",
-        "/_layout/"
+        "/_layout/",
+        "/_layout/post/$postSlug"
       ]
     },
     "/login": {
@@ -214,6 +248,10 @@ export const routeTree = rootRoute
     },
     "/_layout/": {
       "filePath": "_layout/index.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/post/$postSlug": {
+      "filePath": "_layout/post/$postSlug.tsx",
       "parent": "/_layout"
     }
   }

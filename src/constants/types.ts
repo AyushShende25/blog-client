@@ -16,3 +16,8 @@ export type Post = {
 	title: string;
 	updatedAt: string;
 };
+
+export type Category = {
+	id: string;
+	name: string;
+};
