@@ -17,6 +17,7 @@ import { Route as LoginImport } from './routes/login'
 import { Route as LayoutImport } from './routes/_layout'
 import { Route as LayoutIndexImport } from './routes/_layout/index'
 import { Route as LayoutSearchImport } from './routes/_layout/search'
+import { Route as LayoutNewPostImport } from './routes/_layout/newPost'
 import { Route as LayoutPostPostSlugImport } from './routes/_layout/post/$postSlug'
 
 // Create/Update Routes
@@ -53,6 +54,12 @@ const LayoutIndexRoute = LayoutIndexImport.update({
 const LayoutSearchRoute = LayoutSearchImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
+const LayoutNewPostRoute = LayoutNewPostImport.update({
+  id: '/newPost',
+  path: '/newPost',
   getParentRoute: () => LayoutRoute,
 } as any)
 
@@ -94,6 +101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyEmailImport
       parentRoute: typeof rootRoute
     }
+    '/_layout/newPost': {
+      id: '/_layout/newPost'
+      path: '/newPost'
+      fullPath: '/newPost'
+      preLoaderRoute: typeof LayoutNewPostImport
+      parentRoute: typeof LayoutImport
+    }
     '/_layout/search': {
       id: '/_layout/search'
       path: '/search'
@@ -121,12 +135,14 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface LayoutRouteChildren {
+  LayoutNewPostRoute: typeof LayoutNewPostRoute
   LayoutSearchRoute: typeof LayoutSearchRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
   LayoutPostPostSlugRoute: typeof LayoutPostPostSlugRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
+  LayoutNewPostRoute: LayoutNewPostRoute,
   LayoutSearchRoute: LayoutSearchRoute,
   LayoutIndexRoute: LayoutIndexRoute,
   LayoutPostPostSlugRoute: LayoutPostPostSlugRoute,
@@ -140,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/newPost': typeof LayoutNewPostRoute
   '/search': typeof LayoutSearchRoute
   '/': typeof LayoutIndexRoute
   '/post/$postSlug': typeof LayoutPostPostSlugRoute
@@ -149,6 +166,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/newPost': typeof LayoutNewPostRoute
   '/search': typeof LayoutSearchRoute
   '/': typeof LayoutIndexRoute
   '/post/$postSlug': typeof LayoutPostPostSlugRoute
@@ -160,6 +178,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/_layout/newPost': typeof LayoutNewPostRoute
   '/_layout/search': typeof LayoutSearchRoute
   '/_layout/': typeof LayoutIndexRoute
   '/_layout/post/$postSlug': typeof LayoutPostPostSlugRoute
@@ -172,6 +191,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/verify-email'
+    | '/newPost'
     | '/search'
     | '/'
     | '/post/$postSlug'
@@ -180,6 +200,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/verify-email'
+    | '/newPost'
     | '/search'
     | '/'
     | '/post/$postSlug'
@@ -189,6 +210,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/verify-email'
+    | '/_layout/newPost'
     | '/_layout/search'
     | '/_layout/'
     | '/_layout/post/$postSlug'
@@ -228,6 +250,7 @@ export const routeTree = rootRoute
     "/_layout": {
       "filePath": "_layout.tsx",
       "children": [
+        "/_layout/newPost",
         "/_layout/search",
         "/_layout/",
         "/_layout/post/$postSlug"
@@ -241,6 +264,10 @@ export const routeTree = rootRoute
     },
     "/verify-email": {
       "filePath": "verify-email.tsx"
+    },
+    "/_layout/newPost": {
+      "filePath": "_layout/newPost.tsx",
+      "parent": "/_layout"
     },
     "/_layout/search": {
       "filePath": "_layout/search.tsx",

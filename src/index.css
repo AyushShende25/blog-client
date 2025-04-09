@@ -82,3 +82,9 @@
 		@apply flex items-center justify-center;
 	}
 }
+
+.bn-editor {
+	height: 100%;
+	padding-top: 10px;
+	overflow-y: auto;
+}

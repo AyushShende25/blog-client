@@ -9,7 +9,7 @@ import { fallback, zodValidator } from '@tanstack/zod-adapter';
 import { z } from 'zod';
 import { AxiosError } from 'axios';
 
-import { authApi } from '@/api/authApi';
+import { authApi, userQueryOptions } from '@/api/authApi';
 import FieldInfo from '@/components/FieldInfo';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +22,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { ApiErrorResponse } from '@/constants/types';
-import { userQueryOptions } from '@/hooks/useUser';
 
 const signupSearchSchema = z.object({
   redirect: fallback(z.string(), '/').default('/'),

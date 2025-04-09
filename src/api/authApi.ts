@@ -2,6 +2,7 @@ import { api } from "@/api/axiosInstance";
 import type { LoginInput } from "@/routes/login";
 import type { SignupInput } from "@/routes/signup";
 import type { VerifyEmailInput } from "@/routes/verify-email";
+import { queryOptions } from "@tanstack/react-query";
 
 export const authApi = {
 	signup: async (credentials: SignupInput) => {
@@ -49,3 +50,11 @@ api.interceptors.response.use(
 		return Promise.reject(error);
 	},
 );
+
+export const userQueryOptions = () =>
+	queryOptions({
+		queryKey: ["user"],
+		queryFn: authApi.getMe,
+		staleTime: Number.POSITIVE_INFINITY,
+		retry: false,
+	});

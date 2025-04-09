@@ -1,13 +1,13 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 
-import { fetchCategoriesQueryOptions } from '@/api/categoriesApi';
+import { fetchFeaturedCategoriesQueryOptions } from '@/api/categoriesApi';
 import { Badge } from '@/components/ui/badge';
 import type { Category } from '@/constants/types';
 
 function FeaturedCategories() {
   const { data: featuredCategories } = useSuspenseQuery(
-    fetchCategoriesQueryOptions()
+    fetchFeaturedCategoriesQueryOptions()
   );
 
   return (

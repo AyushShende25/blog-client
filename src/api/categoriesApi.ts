@@ -6,11 +6,22 @@ export const categoriesApi = {
 		const res = await api.get("/categories/featured");
 		return res.data;
 	},
+	fetchAllCategories: async () => {
+		const res = await api.get("/categories");
+		return res.data;
+	},
 };
+
+export const fetchFeaturedCategoriesQueryOptions = () =>
+	queryOptions({
+		queryKey: ["categories", "featured"],
+		queryFn: () => categoriesApi.fetchFeaturedCategories(),
+		staleTime: Number.POSITIVE_INFINITY,
+	});
 
 export const fetchCategoriesQueryOptions = () =>
 	queryOptions({
 		queryKey: ["categories"],
-		queryFn: () => categoriesApi.fetchFeaturedCategories(),
+		queryFn: () => categoriesApi.fetchAllCategories(),
 		staleTime: Number.POSITIVE_INFINITY,
 	});
