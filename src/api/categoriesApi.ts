@@ -1,5 +1,6 @@
-import { api } from "@/api/axiosInstance";
 import { queryOptions } from "@tanstack/react-query";
+
+import { api } from "@/api/axiosInstance";
 
 export const categoriesApi = {
 	fetchFeaturedCategories: async () => {

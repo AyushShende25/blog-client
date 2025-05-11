@@ -1,5 +1,7 @@
+import axios from "axios";
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
+import type { CreatePostInput } from "@/constants/types";
 import { api } from "@/api/axiosInstance";
 
 export const postsApi = {
@@ -22,6 +24,25 @@ export const postsApi = {
 
 	fetchPost: async (postSlug: string) => {
 		const res = await api.get(`/posts/${postSlug}`);
+		return res.data;
+	},
+
+	getPresignedUrl: async (filename: string, filetype: string) => {
+		const res = await api.post("/posts/generate-presigned-url", {
+			filename,
+			filetype,
+		});
+		return res.data;
+	},
+
+	uploadToS3: async (signedUrl: string, file: File) => {
+		await axios.put(signedUrl, file, {
+			headers: { "Content-Type": file.type },
+		});
+	},
+
+	createPost: async (createPostInput: CreatePostInput) => {
+		const res = await api.post("/posts", createPostInput);
 		return res.data;
 	},
 };

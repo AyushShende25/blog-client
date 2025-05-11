@@ -1,8 +1,9 @@
-import { api } from "@/api/axiosInstance";
-import type { LoginInput } from "@/routes/login";
-import type { SignupInput } from "@/routes/signup";
-import type { VerifyEmailInput } from "@/routes/verify-email";
 import { queryOptions } from "@tanstack/react-query";
+
+import { api } from "@/api/axiosInstance";
+import type { LoginInput } from "@/constants/types";
+import type { SignupInput } from "@/constants/types";
+import type { VerifyEmailInput } from "@/constants/types";
 
 export const authApi = {
 	signup: async (credentials: SignupInput) => {

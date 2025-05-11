@@ -7,9 +7,8 @@ import {
   useNavigate,
   useRouter,
 } from '@tanstack/react-router';
-import { fallback, zodValidator } from '@tanstack/zod-adapter';
+import { zodValidator } from '@tanstack/zod-adapter';
 import { AxiosError } from 'axios';
-import { z } from 'zod';
 
 import { authApi, userQueryOptions } from '@/api/authApi';
 import FieldInfo from '@/components/FieldInfo';
@@ -24,20 +23,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { ApiErrorResponse } from '@/constants/types';
-
-const loginSearchSchema = z.object({
-  redirect: fallback(z.string(), '/').default('/'),
-});
-
-export const loginSchema = z.object({
-  email: z.string().trim().email('Invalid email address'),
-  password: z.string().trim().min(1, 'paasword cannot be empty'),
-});
-export type LoginInput = z.infer<typeof loginSchema>;
+import { loginSchema, authSearchSchema } from '@/constants/schema';
 
 export const Route = createFileRoute('/login')({
   component: LoginComponent,
-  validateSearch: zodValidator(loginSearchSchema),
+  validateSearch: zodValidator(authSearchSchema),
   beforeLoad: async ({ context, search }) => {
     const user = await context.queryClient.ensureQueryData(userQueryOptions());
     if (user) {

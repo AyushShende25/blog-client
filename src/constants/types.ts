@@ -1,3 +1,12 @@
+// biome-ignore lint/style/useImportType: <explanation>
+import { z } from "zod";
+import type {
+	createPostSchema,
+	loginSchema,
+	signupSchema,
+	verifyEmailSchema,
+} from "@/constants/schema";
+
 export interface ApiErrorResponse {
 	success: false;
 	message: string;
@@ -21,3 +30,17 @@ export type Category = {
 	id: string;
 	name: string;
 };
+
+export type EditorRef = {
+	getContent: () => string;
+	getUploadedImages: () => string[];
+	setContent: (content: string) => void;
+};
+
+export type LoginInput = z.infer<typeof loginSchema>;
+
+export type SignupInput = z.infer<typeof signupSchema>;
+
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+
+export type CreatePostInput = z.infer<typeof createPostSchema>;

@@ -83,8 +83,17 @@
 	}
 }
 
-.bn-editor {
-	height: 100%;
-	padding-top: 10px;
-	overflow-y: auto;
+.ql-toolbar.ql-snow{
+	border: none;
+}
+.ql-container.ql-snow {
+	border: none;
+}
+
+
+.ql-editor img {
+	max-width: 40% !important;
+	height: auto;
+  display: block;
+  margin: 1rem auto;
 }

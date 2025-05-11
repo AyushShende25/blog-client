@@ -1,9 +1,8 @@
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { fallback, zodValidator } from '@tanstack/zod-adapter';
+import { zodValidator } from '@tanstack/zod-adapter';
 import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { z } from 'zod';
 
 import FeaturedCategories from '@/components/FeaturedCategories';
 import PostCard from '@/components/PostCard';
@@ -18,12 +17,7 @@ import {
 } from '@/components/ui/select';
 import type { Post } from '@/constants/types';
 import { fetchPostListQueryOptions } from '@/api/postsApi';
-
-export const blogSearchSchema = z.object({
-  filter: fallback(z.string(), '').default(''),
-  category: fallback(z.string(), '').default(''),
-  sort: fallback(z.string(), 'createdAt:desc').default('createdAt:desc'),
-});
+import { blogSearchSchema } from '@/constants/schema';
 
 export const Route = createFileRoute('/_layout/search')({
   component: RouteComponent,

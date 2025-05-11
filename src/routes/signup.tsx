@@ -5,8 +5,7 @@ import {
   redirect,
   useNavigate,
 } from '@tanstack/react-router';
-import { fallback, zodValidator } from '@tanstack/zod-adapter';
-import { z } from 'zod';
+import { zodValidator } from '@tanstack/zod-adapter';
 import { AxiosError } from 'axios';
 
 import { authApi, userQueryOptions } from '@/api/authApi';
@@ -22,14 +21,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { ApiErrorResponse } from '@/constants/types';
-
-const signupSearchSchema = z.object({
-  redirect: fallback(z.string(), '/').default('/'),
-});
+import { signupSchema, authSearchSchema } from '@/constants/schema';
 
 export const Route = createFileRoute('/signup')({
   component: SignupComponent,
-  validateSearch: zodValidator(signupSearchSchema),
+  validateSearch: zodValidator(authSearchSchema),
   beforeLoad: async ({ context, search }) => {
     const user = await context.queryClient.ensureQueryData(userQueryOptions());
     if (user) {
@@ -37,17 +33,6 @@ export const Route = createFileRoute('/signup')({
     }
   },
 });
-
-export const signupSchema = z.object({
-  username: z.string().trim().min(1, 'username cannot be empty'),
-  email: z.string().trim().email('Invalid email address'),
-  password: z
-    .string()
-    .trim()
-    .min(8, 'Password must be more than 8 characters')
-    .max(32, 'Password must be less than 32 characters'),
-});
-export type SignupInput = z.infer<typeof signupSchema>;
 
 function SignupComponent() {
   const navigate = useNavigate();

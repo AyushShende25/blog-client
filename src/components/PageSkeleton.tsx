@@ -8,10 +8,10 @@ function PageSkeleton() {
         <Skeleton className="h-12 w-1/2 mx-auto mt-2" />
       </h1>
 
-      <p className="space-x-4 text-lg font-semibold text-center flex justify-center items-center">
+      <div className="space-x-4 text-lg font-semibold text-center flex justify-center items-center">
         <Skeleton className="h-10 w-32" />
         <span>and get Inspired!</span>
-      </p>
+      </div>
 
       <div className="h-1 bg-foreground w-full my-10" />
 

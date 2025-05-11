@@ -1,8 +1,7 @@
 import { useForm } from '@tanstack/react-form';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
-import { fallback, zodValidator } from '@tanstack/zod-adapter';
+import { zodValidator } from '@tanstack/zod-adapter';
 import { AxiosError } from 'axios';
-import { z } from 'zod';
 
 import { authApi, userQueryOptions } from '@/api/authApi';
 import FieldInfo from '@/components/FieldInfo';
@@ -14,14 +13,11 @@ import {
 } from '@/components/ui/input-otp';
 import { Label } from '@/components/ui/label';
 import type { ApiErrorResponse } from '@/constants/types';
-
-const verifyEmailSearchSchema = z.object({
-  redirect: fallback(z.string(), '/').default('/'),
-});
+import { authSearchSchema, verifyEmailSchema } from '@/constants/schema';
 
 export const Route = createFileRoute('/verify-email')({
   component: VerifyEmailComponent,
-  validateSearch: zodValidator(verifyEmailSearchSchema),
+  validateSearch: zodValidator(authSearchSchema),
   beforeLoad: async ({ context, search }) => {
     const user = await context.queryClient.ensureQueryData(userQueryOptions());
     if (user) {
@@ -29,11 +25,6 @@ export const Route = createFileRoute('/verify-email')({
     }
   },
 });
-
-export const verifyEmailSchema = z.object({
-  verificationCode: z.string().trim().min(6, 'otp is of 6 digits'),
-});
-export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
 
 function VerifyEmailComponent() {
   const navigate = useNavigate();
