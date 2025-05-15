@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ModeToggle } from '@/components/mode-toggle';
 
 function Header() {
   const [isSearchBannerOpen, setIsSearchBannerOpen] = useState(false);
@@ -107,7 +108,6 @@ function Header() {
               className="pl-10 rounded-3xl"
             />
           </div>
-
           <Button
             size="icon"
             className="md:hidden"
@@ -116,6 +116,7 @@ function Header() {
           >
             <Search />
           </Button>
+          <ModeToggle />
           {user ? (
             <>
               <DropdownMenu>

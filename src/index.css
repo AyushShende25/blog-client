@@ -83,17 +83,136 @@
 	}
 }
 
-.ql-toolbar.ql-snow{
-	border: none;
-}
-.ql-container.ql-snow {
-	border: none;
-}
+.tiptap-editor {
+  /* Base editor styling */
+  font-size: 1rem;
+  line-height: 1.75;
 
+  /* Remove top margin on first element */
+  > *:first-child {
+    margin-top: 0;
+  }
 
-.ql-editor img {
-	max-width: 40% !important;
-	height: auto;
-  display: block;
-  margin: 1rem auto;
+  /* Paragraph */
+  p {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    line-height: 1.2;
+    text-wrap: balance;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-size: 1.75rem; /* ~text-2xl */
+    margin-top: 3.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.5rem; /* ~text-xl */
+    margin-top: 3rem;
+    margin-bottom: 1.25rem;
+  }
+
+  h3 {
+    font-size: 1.25rem; /* ~text-lg */
+  }
+
+  h4, h5, h6 {
+    font-size: 1.125rem; /* ~text-base to md */
+  }
+
+  /* Lists */
+  ul,
+  ol {
+    padding-left: 1.5rem;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul li p,
+  ol li p {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+  }
+
+  /* Marks: inline bold, italic, strike, code */
+  strong {
+    font-weight: 600;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  s {
+    text-decoration: line-through;
+  }
+
+  code {
+    background-color: oklch(37% 0.013 285.805); /* light purple */
+    border-radius: 0.375rem;
+    color: oklch(92% 0.004 286.32); /* Tailwind gray-800 */
+    font-size: 0.875rem;
+    padding: 0.25em 0.4em;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Code block */
+  pre {
+    background-color: oklch(27.4% 0.006 286.033); /* Tailwind zinc-800 */
+    color: oklch(98.4% 0.003 247.858);             /* Tailwind slate-50 */
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', Menlo, Monaco, Consolas, 'Courier New', monospace;
+    font-size: 0.875rem;
+  }
+
+  pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  /* Blockquote */
+  blockquote {
+    border-left: 4px solid oklch(87.2% 0.01 258.338); /* Tailwind gray-300 */
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    color: oklch(44.6% 0.03 256.802); /* Tailwind gray-600 */
+    font-style: italic;
+  }
+
+  /* Horizontal Rule */
+  hr {
+    border: none;
+    border-top: 1px solid oklch(92.8% 0.006 264.531); /* Tailwind gray-200 */
+    margin: 2rem 0;
+  }
+
+  a {
+    color: oklch(54.6% 0.245 262.881);
+    text-decoration: underline;
+  }
+
+  a:hover {
+    color: oklch(42.4% 0.199 265.638);
+  }
 }

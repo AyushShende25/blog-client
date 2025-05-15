@@ -1,21 +1,19 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { useForm, useStore } from '@tanstack/react-form';
-import { useRef } from 'react';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
-import Editor from '@/components/Editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
 import { userQueryOptions } from '@/api/authApi';
 import { Label } from '@/components/ui/label';
 import { postsApi } from '@/api/postsApi';
-import type { ApiErrorResponse, Category, EditorRef } from '@/constants/types';
+import type { ApiErrorResponse, Category } from '@/constants/types';
 import { fetchCategoriesQueryOptions } from '@/api/categoriesApi';
 import MultiSelect from '@/components/MultiSelect';
 import { createPostSchema } from '@/constants/schema';
+import Tiptap from '@/components/Tiptap';
 
 export const Route = createFileRoute('/_layout/newPost')({
   component: NewPost,
@@ -28,7 +26,6 @@ export const Route = createFileRoute('/_layout/newPost')({
 });
 
 function NewPost() {
-  const editorRef = useRef<EditorRef | null>(null);
   const { data } = useQuery(fetchCategoriesQueryOptions());
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -40,24 +37,14 @@ function NewPost() {
       status: 'DRAFT',
       coverImage: undefined,
       categories: [],
+      images: [] as string[],
     },
     validators: {
       onChange: createPostSchema,
     },
     onSubmit: async ({ value }) => {
-      const content = editorRef.current?.getContent() || '';
-
-      // Get all uploaded images from the editor
-      const inlineImages = editorRef.current?.getUploadedImages() || [];
-
-      const data = {
-        ...value,
-        content,
-        images: inlineImages,
-      };
-
       try {
-        const res = await postsApi.createPost(data);
+        const res = await postsApi.createPost(value);
         await queryClient.invalidateQueries({ queryKey: ['posts'] });
         if (data.status === 'PUBLISHED') {
           await navigate({ to: `/post/${res?.data.slug}` });
@@ -115,6 +102,7 @@ function NewPost() {
 
   const formErrorMap = useStore(form.store, (state) => state.errorMap);
 
+  const coverImg = useStore(form.store, (state) => state.values.coverImage);
   return (
     <section className="pd-x pd-y">
       <form
@@ -126,6 +114,13 @@ function NewPost() {
       >
         <div className=" shadow rounded">
           <div className="px-6 py-4 bg-card">
+            {coverImg && (
+              <img
+                className="mb-4 max-w-72 object-cover"
+                src={coverImg}
+                alt=""
+              />
+            )}
             <div className="flex flex-col md:flex-row gap-2 md:gap-4">
               <Label
                 htmlFor="cover-image"
@@ -174,9 +169,17 @@ function NewPost() {
               )}
             />
           </div>
-          <Separator className="h-4" />
+
           <div>
-            <Editor ref={editorRef} />
+            <Tiptap
+              onContentChange={(html) => form.setFieldValue('content', html)}
+              onImageChange={(imgSrc) =>
+                form.setFieldValue('images', [
+                  ...(form.getFieldValue('images') ?? []),
+                  imgSrc,
+                ])
+              }
+            />
           </div>
         </div>
 

@@ -24,17 +24,12 @@ export type Post = {
 	status: "PUBLISHED" | "DRAFT";
 	title: string;
 	updatedAt: string;
+	coverImage: string;
 };
 
 export type Category = {
 	id: string;
 	name: string;
-};
-
-export type EditorRef = {
-	getContent: () => string;
-	getUploadedImages: () => string[];
-	setContent: (content: string) => void;
 };
 
 export type LoginInput = z.infer<typeof loginSchema>;
