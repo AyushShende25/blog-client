@@ -1,9 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { authApi, userQueryOptions } from '@/api/authApi';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +15,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ModeToggle } from '@/components/mode-toggle';
+import { userQueryOptions } from '@/api/userApi';
+import useLogout from '@/hooks/useLogout';
 
 function Header() {
   const [isSearchBannerOpen, setIsSearchBannerOpen] = useState(false);
@@ -36,16 +37,9 @@ function Header() {
 
   const { data: user } = useQuery(userQueryOptions());
 
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { mutate: logoutMutation } = useMutation({
-    mutationFn: authApi.logout,
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-      navigate({ to: '/login' });
-    },
-  });
+  const { logoutMutation } = useLogout();
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const searchQuery = e.currentTarget.value;
@@ -127,11 +121,12 @@ function Header() {
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <Link to="/newPost">
-                    <DropdownMenuItem>Create Post</DropdownMenuItem>
+                  <Link to="/new-post">
+                    <DropdownMenuItem>New Post</DropdownMenuItem>
                   </Link>
-                  <DropdownMenuItem>Library</DropdownMenuItem>
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <Link to="/dashboard">
+                    <DropdownMenuItem>Dashboard</DropdownMenuItem>
+                  </Link>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => logoutMutation()}>
                     Logout

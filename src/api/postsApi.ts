@@ -1,8 +1,27 @@
 import axios from "axios";
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
-import type { CreatePostInput } from "@/constants/types";
+import type { CreatePostInput, Post, POST_STATUS } from "@/constants/types";
 import { api } from "@/api/axiosInstance";
+
+interface PostListResponse {
+	data: Post[];
+	meta: {
+		totalPages: number;
+		page: number;
+		limit: number;
+		totalItems: number;
+		hasNextPage: boolean;
+		hasPreviousPage: boolean;
+	};
+}
+
+interface PostListParams {
+	pageParam: number;
+	filter?: string;
+	sort?: string;
+	category?: string;
+}
 
 export const postsApi = {
 	fetchPostList: async ({
@@ -10,17 +29,19 @@ export const postsApi = {
 		filter,
 		sort,
 		category,
-	}: {
-		pageParam: number;
-		filter?: string;
-		sort?: string;
-		category?: string;
-	}) => {
-		const res = await api.get(
-			`/posts?limit=10&page=${pageParam}&filter=${filter}&category=${category}&sort=${sort}`,
-		);
+	}: PostListParams): Promise<PostListResponse> => {
+		const query = new URLSearchParams({
+			limit: "10",
+			page: String(pageParam),
+			...(filter && { filter }),
+			...(sort && { sort }),
+			...(category && { category }),
+		}).toString();
+
+		const res = await api.get(`/posts?${query}`);
 		return res.data;
 	},
+
 
 	fetchPost: async (postSlug: string) => {
 		const res = await api.get(`/posts/${postSlug}`);
@@ -43,6 +64,17 @@ export const postsApi = {
 
 	createPost: async (createPostInput: CreatePostInput) => {
 		const res = await api.post("/posts", createPostInput);
+		return res.data;
+	},
+
+	fetchUserPosts: async (status: POST_STATUS) => {
+		const res = await api.get(`/posts/user?status=${status}`);
+		return res.data;
+	},
+
+	deletePost: async (postId: string) => {
+		const res = await api.delete(`/posts/${postId}`);
+		console.log(res.data, "deleted");
 		return res.data;
 	},
 };
@@ -70,5 +102,12 @@ export const fetchPostQueryOptions = (postSlug: string) =>
 	queryOptions({
 		queryKey: ["post", postSlug],
 		queryFn: () => postsApi.fetchPost(postSlug),
+		staleTime: Number.POSITIVE_INFINITY,
+	});
+
+export const fetchUserPostsQueryOptions = (status: POST_STATUS) =>
+	queryOptions({
+		queryKey: ["posts", "user", { status }],
+		queryFn: () => postsApi.fetchUserPosts(status),
 		staleTime: Number.POSITIVE_INFINITY,
 	});

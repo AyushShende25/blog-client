@@ -1,5 +1,3 @@
-import { queryOptions } from "@tanstack/react-query";
-
 import { api } from "@/api/axiosInstance";
 import type { LoginInput } from "@/constants/types";
 import type { SignupInput } from "@/constants/types";
@@ -17,14 +15,6 @@ export const authApi = {
 	verifyEmail: async (data: VerifyEmailInput) => {
 		const res = await api.post("/auth/verify-email", data);
 		return res.data;
-	},
-	getMe: async () => {
-		try {
-			const res = await api.get("/auth/me");
-			return res.data.data;
-		} catch (error) {
-			return null;
-		}
 	},
 	logout: async () => {
 		const res = await api.post("/auth/logout");
@@ -51,11 +41,3 @@ api.interceptors.response.use(
 		return Promise.reject(error);
 	},
 );
-
-export const userQueryOptions = () =>
-	queryOptions({
-		queryKey: ["user"],
-		queryFn: authApi.getMe,
-		staleTime: Number.POSITIVE_INFINITY,
-		retry: false,
-	});

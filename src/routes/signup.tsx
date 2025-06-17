@@ -8,7 +8,7 @@ import {
 import { zodValidator } from '@tanstack/zod-adapter';
 import { AxiosError } from 'axios';
 
-import { authApi, userQueryOptions } from '@/api/authApi';
+import { authApi } from '@/api/authApi';
 import FieldInfo from '@/components/FieldInfo';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { ApiErrorResponse } from '@/constants/types';
 import { signupSchema, authSearchSchema } from '@/constants/schema';
+import { userQueryOptions } from '@/api/userApi';
 
 export const Route = createFileRoute('/signup')({
   component: SignupComponent,

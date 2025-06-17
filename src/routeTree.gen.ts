@@ -15,10 +15,16 @@ import { Route as VerifyEmailImport } from './routes/verify-email'
 import { Route as SignupImport } from './routes/signup'
 import { Route as LoginImport } from './routes/login'
 import { Route as LayoutImport } from './routes/_layout'
+import { Route as DashboardImport } from './routes/_dashboard'
 import { Route as LayoutIndexImport } from './routes/_layout/index'
 import { Route as LayoutSearchImport } from './routes/_layout/search'
-import { Route as LayoutNewPostImport } from './routes/_layout/newPost'
+import { Route as LayoutNewPostImport } from './routes/_layout/new-post'
+import { Route as DashboardDashboardIndexImport } from './routes/_dashboard/dashboard/index'
 import { Route as LayoutPostPostSlugImport } from './routes/_layout/post/$postSlug'
+import { Route as DashboardDashboardPublishedImport } from './routes/_dashboard/dashboard/published'
+import { Route as DashboardDashboardProfileImport } from './routes/_dashboard/dashboard/profile'
+import { Route as DashboardDashboardLibraryImport } from './routes/_dashboard/dashboard/library'
+import { Route as DashboardDashboardDraftImport } from './routes/_dashboard/dashboard/draft'
 
 // Create/Update Routes
 
@@ -45,6 +51,11 @@ const LayoutRoute = LayoutImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const DashboardRoute = DashboardImport.update({
+  id: '/_dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const LayoutIndexRoute = LayoutIndexImport.update({
   id: '/',
   path: '/',
@@ -58,9 +69,15 @@ const LayoutSearchRoute = LayoutSearchImport.update({
 } as any)
 
 const LayoutNewPostRoute = LayoutNewPostImport.update({
-  id: '/newPost',
-  path: '/newPost',
+  id: '/new-post',
+  path: '/new-post',
   getParentRoute: () => LayoutRoute,
+} as any)
+
+const DashboardDashboardIndexRoute = DashboardDashboardIndexImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => DashboardRoute,
 } as any)
 
 const LayoutPostPostSlugRoute = LayoutPostPostSlugImport.update({
@@ -69,10 +86,42 @@ const LayoutPostPostSlugRoute = LayoutPostPostSlugImport.update({
   getParentRoute: () => LayoutRoute,
 } as any)
 
+const DashboardDashboardPublishedRoute =
+  DashboardDashboardPublishedImport.update({
+    id: '/dashboard/published',
+    path: '/dashboard/published',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+
+const DashboardDashboardProfileRoute = DashboardDashboardProfileImport.update({
+  id: '/dashboard/profile',
+  path: '/dashboard/profile',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardDashboardLibraryRoute = DashboardDashboardLibraryImport.update({
+  id: '/dashboard/library',
+  path: '/dashboard/library',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
+const DashboardDashboardDraftRoute = DashboardDashboardDraftImport.update({
+  id: '/dashboard/draft',
+  path: '/dashboard/draft',
+  getParentRoute: () => DashboardRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_dashboard': {
+      id: '/_dashboard'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof DashboardImport
+      parentRoute: typeof rootRoute
+    }
     '/_layout': {
       id: '/_layout'
       path: ''
@@ -101,10 +150,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerifyEmailImport
       parentRoute: typeof rootRoute
     }
-    '/_layout/newPost': {
-      id: '/_layout/newPost'
-      path: '/newPost'
-      fullPath: '/newPost'
+    '/_layout/new-post': {
+      id: '/_layout/new-post'
+      path: '/new-post'
+      fullPath: '/new-post'
       preLoaderRoute: typeof LayoutNewPostImport
       parentRoute: typeof LayoutImport
     }
@@ -122,6 +171,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutIndexImport
       parentRoute: typeof LayoutImport
     }
+    '/_dashboard/dashboard/draft': {
+      id: '/_dashboard/dashboard/draft'
+      path: '/dashboard/draft'
+      fullPath: '/dashboard/draft'
+      preLoaderRoute: typeof DashboardDashboardDraftImport
+      parentRoute: typeof DashboardImport
+    }
+    '/_dashboard/dashboard/library': {
+      id: '/_dashboard/dashboard/library'
+      path: '/dashboard/library'
+      fullPath: '/dashboard/library'
+      preLoaderRoute: typeof DashboardDashboardLibraryImport
+      parentRoute: typeof DashboardImport
+    }
+    '/_dashboard/dashboard/profile': {
+      id: '/_dashboard/dashboard/profile'
+      path: '/dashboard/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof DashboardDashboardProfileImport
+      parentRoute: typeof DashboardImport
+    }
+    '/_dashboard/dashboard/published': {
+      id: '/_dashboard/dashboard/published'
+      path: '/dashboard/published'
+      fullPath: '/dashboard/published'
+      preLoaderRoute: typeof DashboardDashboardPublishedImport
+      parentRoute: typeof DashboardImport
+    }
     '/_layout/post/$postSlug': {
       id: '/_layout/post/$postSlug'
       path: '/post/$postSlug'
@@ -129,10 +206,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutPostPostSlugImport
       parentRoute: typeof LayoutImport
     }
+    '/_dashboard/dashboard/': {
+      id: '/_dashboard/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardDashboardIndexImport
+      parentRoute: typeof DashboardImport
+    }
   }
 }
 
 // Create and export the route tree
+
+interface DashboardRouteChildren {
+  DashboardDashboardDraftRoute: typeof DashboardDashboardDraftRoute
+  DashboardDashboardLibraryRoute: typeof DashboardDashboardLibraryRoute
+  DashboardDashboardProfileRoute: typeof DashboardDashboardProfileRoute
+  DashboardDashboardPublishedRoute: typeof DashboardDashboardPublishedRoute
+  DashboardDashboardIndexRoute: typeof DashboardDashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardDashboardDraftRoute: DashboardDashboardDraftRoute,
+  DashboardDashboardLibraryRoute: DashboardDashboardLibraryRoute,
+  DashboardDashboardProfileRoute: DashboardDashboardProfileRoute,
+  DashboardDashboardPublishedRoute: DashboardDashboardPublishedRoute,
+  DashboardDashboardIndexRoute: DashboardDashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
 
 interface LayoutRouteChildren {
   LayoutNewPostRoute: typeof LayoutNewPostRoute
@@ -156,32 +260,49 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
-  '/newPost': typeof LayoutNewPostRoute
+  '/new-post': typeof LayoutNewPostRoute
   '/search': typeof LayoutSearchRoute
   '/': typeof LayoutIndexRoute
+  '/dashboard/draft': typeof DashboardDashboardDraftRoute
+  '/dashboard/library': typeof DashboardDashboardLibraryRoute
+  '/dashboard/profile': typeof DashboardDashboardProfileRoute
+  '/dashboard/published': typeof DashboardDashboardPublishedRoute
   '/post/$postSlug': typeof LayoutPostPostSlugRoute
+  '/dashboard': typeof DashboardDashboardIndexRoute
 }
 
 export interface FileRoutesByTo {
+  '': typeof DashboardRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
-  '/newPost': typeof LayoutNewPostRoute
+  '/new-post': typeof LayoutNewPostRoute
   '/search': typeof LayoutSearchRoute
   '/': typeof LayoutIndexRoute
+  '/dashboard/draft': typeof DashboardDashboardDraftRoute
+  '/dashboard/library': typeof DashboardDashboardLibraryRoute
+  '/dashboard/profile': typeof DashboardDashboardProfileRoute
+  '/dashboard/published': typeof DashboardDashboardPublishedRoute
   '/post/$postSlug': typeof LayoutPostPostSlugRoute
+  '/dashboard': typeof DashboardDashboardIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
+  '/_dashboard': typeof DashboardRouteWithChildren
   '/_layout': typeof LayoutRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
-  '/_layout/newPost': typeof LayoutNewPostRoute
+  '/_layout/new-post': typeof LayoutNewPostRoute
   '/_layout/search': typeof LayoutSearchRoute
   '/_layout/': typeof LayoutIndexRoute
+  '/_dashboard/dashboard/draft': typeof DashboardDashboardDraftRoute
+  '/_dashboard/dashboard/library': typeof DashboardDashboardLibraryRoute
+  '/_dashboard/dashboard/profile': typeof DashboardDashboardProfileRoute
+  '/_dashboard/dashboard/published': typeof DashboardDashboardPublishedRoute
   '/_layout/post/$postSlug': typeof LayoutPostPostSlugRoute
+  '/_dashboard/dashboard/': typeof DashboardDashboardIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -191,33 +312,51 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/verify-email'
-    | '/newPost'
+    | '/new-post'
     | '/search'
     | '/'
+    | '/dashboard/draft'
+    | '/dashboard/library'
+    | '/dashboard/profile'
+    | '/dashboard/published'
     | '/post/$postSlug'
+    | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | ''
     | '/login'
     | '/signup'
     | '/verify-email'
-    | '/newPost'
+    | '/new-post'
     | '/search'
     | '/'
+    | '/dashboard/draft'
+    | '/dashboard/library'
+    | '/dashboard/profile'
+    | '/dashboard/published'
     | '/post/$postSlug'
+    | '/dashboard'
   id:
     | '__root__'
+    | '/_dashboard'
     | '/_layout'
     | '/login'
     | '/signup'
     | '/verify-email'
-    | '/_layout/newPost'
+    | '/_layout/new-post'
     | '/_layout/search'
     | '/_layout/'
+    | '/_dashboard/dashboard/draft'
+    | '/_dashboard/dashboard/library'
+    | '/_dashboard/dashboard/profile'
+    | '/_dashboard/dashboard/published'
     | '/_layout/post/$postSlug'
+    | '/_dashboard/dashboard/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
+  DashboardRoute: typeof DashboardRouteWithChildren
   LayoutRoute: typeof LayoutRouteWithChildren
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
@@ -225,6 +364,7 @@ export interface RootRouteChildren {
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  DashboardRoute: DashboardRouteWithChildren,
   LayoutRoute: LayoutRouteWithChildren,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
@@ -241,16 +381,27 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
+        "/_dashboard",
         "/_layout",
         "/login",
         "/signup",
         "/verify-email"
       ]
     },
+    "/_dashboard": {
+      "filePath": "_dashboard.tsx",
+      "children": [
+        "/_dashboard/dashboard/draft",
+        "/_dashboard/dashboard/library",
+        "/_dashboard/dashboard/profile",
+        "/_dashboard/dashboard/published",
+        "/_dashboard/dashboard/"
+      ]
+    },
     "/_layout": {
       "filePath": "_layout.tsx",
       "children": [
-        "/_layout/newPost",
+        "/_layout/new-post",
         "/_layout/search",
         "/_layout/",
         "/_layout/post/$postSlug"
@@ -265,8 +416,8 @@ export const routeTree = rootRoute
     "/verify-email": {
       "filePath": "verify-email.tsx"
     },
-    "/_layout/newPost": {
-      "filePath": "_layout/newPost.tsx",
+    "/_layout/new-post": {
+      "filePath": "_layout/new-post.tsx",
       "parent": "/_layout"
     },
     "/_layout/search": {
@@ -277,9 +428,29 @@ export const routeTree = rootRoute
       "filePath": "_layout/index.tsx",
       "parent": "/_layout"
     },
+    "/_dashboard/dashboard/draft": {
+      "filePath": "_dashboard/dashboard/draft.tsx",
+      "parent": "/_dashboard"
+    },
+    "/_dashboard/dashboard/library": {
+      "filePath": "_dashboard/dashboard/library.tsx",
+      "parent": "/_dashboard"
+    },
+    "/_dashboard/dashboard/profile": {
+      "filePath": "_dashboard/dashboard/profile.tsx",
+      "parent": "/_dashboard"
+    },
+    "/_dashboard/dashboard/published": {
+      "filePath": "_dashboard/dashboard/published.tsx",
+      "parent": "/_dashboard"
+    },
     "/_layout/post/$postSlug": {
       "filePath": "_layout/post/$postSlug.tsx",
       "parent": "/_layout"
+    },
+    "/_dashboard/dashboard/": {
+      "filePath": "_dashboard/dashboard/index.tsx",
+      "parent": "/_dashboard"
     }
   }
 }

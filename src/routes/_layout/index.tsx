@@ -30,6 +30,7 @@ function HomeComponent() {
       fetchNextPage();
     }
   }, [fetchNextPage, inView]);
+  const allPosts = data?.pages.flatMap((page) => page.data) || [];
 
   return (
     <section className="pd-x pd-y">
@@ -51,13 +52,19 @@ function HomeComponent() {
 
       <section>
         <FeaturedCategories />
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
-          {data?.pages.map((page) => {
-            return page.data.map((item: Post) => (
-              <PostCard key={item.id} postData={item} />
-            ));
-          })}
-        </div>
+        {allPosts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
+            {allPosts.map((post: Post) => (
+              <PostCard key={post.id} postData={post} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg">
+              No posts available yet.
+            </p>
+          </div>
+        )}
 
         <div ref={ref} />
 
@@ -65,8 +72,8 @@ function HomeComponent() {
           {isFetchingNextPage
             ? 'Loading more...'
             : hasNextPage
-              ? 'Load Newer'
-              : 'Nothing more to load'}
+            ? 'Load Newer'
+            : 'Nothing more to load'}
         </p>
       </section>
     </section>

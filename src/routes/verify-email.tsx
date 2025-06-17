@@ -3,7 +3,7 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { zodValidator } from '@tanstack/zod-adapter';
 import { AxiosError } from 'axios';
 
-import { authApi, userQueryOptions } from '@/api/authApi';
+import { authApi } from '@/api/authApi';
 import FieldInfo from '@/components/FieldInfo';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +14,7 @@ import {
 import { Label } from '@/components/ui/label';
 import type { ApiErrorResponse } from '@/constants/types';
 import { authSearchSchema, verifyEmailSchema } from '@/constants/schema';
+import { userQueryOptions } from '@/api/userApi';
 
 export const Route = createFileRoute('/verify-email')({
   component: VerifyEmailComponent,

@@ -1,9 +1,13 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import DOMPurify from 'dompurify';
 
 import { fetchPostQueryOptions } from '@/api/postsApi';
-import type { Post } from '@/constants/types';
+import type { Post, SavedPost } from '@/constants/types';
+import { fetchSavedPostsQueryOptions, userQueryOptions } from '@/api/userApi';
+import useSavePost from '@/hooks/useSavePost';
+import useUnsavePost from '@/hooks/useUnsavePost';
+import { Bookmark } from 'lucide-react';
 
 export const Route = createFileRoute('/_layout/post/$postSlug')({
   component: RouteComponent,
@@ -16,9 +20,27 @@ export const Route = createFileRoute('/_layout/post/$postSlug')({
 
 function RouteComponent() {
   const { postSlug } = Route.useParams();
-  const { data } = useSuspenseQuery(fetchPostQueryOptions(postSlug));
-  const { coverImage, title, content, author, createdAt } = data?.data as Post;
+  const { data: post } = useSuspenseQuery(fetchPostQueryOptions(postSlug));
+  const { data: user } = useQuery(userQueryOptions());
+  const { data: savedPostsData } = useQuery(
+    fetchSavedPostsQueryOptions(!!user)
+  );
+  const { coverImage, title, content, author, createdAt, id } =
+    post?.data as Post;
 
+  const savedPosts = savedPostsData?.data ?? [];
+  const isSaved = savedPosts.some((p: SavedPost) => p.id === id);
+
+  const { savePostMutation } = useSavePost();
+  const { unsavePostMutation } = useUnsavePost();
+
+  const handleToggleSave = () => {
+    if (isSaved) {
+      unsavePostMutation(id);
+    } else {
+      savePostMutation(id);
+    }
+  };
   return (
     <article className="pd-x pd-y">
       <div className="md:px-20 lg:px-28">
@@ -30,17 +52,22 @@ function RouteComponent() {
           <div className="w-16 h-16">
             <img className="rounded-full" src="/user2.jpg" alt="author pic" />
           </div>
-          <div>
-            <p>
-              By <span className="font-semibold">{author.username}</span>
-            </p>
-            <p>
-              {new Date(createdAt).toLocaleDateString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-              })}
-            </p>
+          <div className="w-full flex justify-between items-center">
+            <div>
+              <p>
+                By <span className="font-semibold">{author.username}</span>
+              </p>
+              <p>
+                {new Date(createdAt).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </p>
+            </div>{' '}
+            <div onClick={handleToggleSave} className="cursor-pointer">
+              {user ? isSaved ? <Bookmark fill="#000" /> : <Bookmark /> : null}
+            </div>
           </div>
         </div>
         {coverImage && (

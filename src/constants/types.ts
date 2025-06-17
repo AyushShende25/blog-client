@@ -15,7 +15,7 @@ export interface ApiErrorResponse {
 export type Post = {
 	author: { username: string };
 	authorId: string;
-	categories: { name: string }[];
+	categories: { id: string; name: string }[];
 	content: string;
 	createdAt: string;
 	id: string;
@@ -39,3 +39,29 @@ export type SignupInput = z.infer<typeof signupSchema>;
 export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
 
 export type CreatePostInput = z.infer<typeof createPostSchema>;
+
+export const POST_STATUSES = {
+	PUBLISHED: "PUBLISHED",
+	DRAFT: "DRAFT",
+} as const;
+
+export type POST_STATUS = (typeof POST_STATUSES)[keyof typeof POST_STATUSES];
+
+export const ROLES = {
+	USER: "USER",
+	ADMIN: "ADMIN",
+} as const;
+
+export type ROLE = (typeof ROLES)[keyof typeof ROLES];
+
+export type SavedPost = Omit<Post, "author" | "categories">;
+
+export type User = {
+	createdAt: string;
+	email: string;
+	id: string;
+	isVerified: boolean;
+	role: ROLE;
+	updatedAt: string;
+	username: string;
+};

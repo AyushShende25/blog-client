@@ -6,7 +6,6 @@ import { AxiosError } from 'axios';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { userQueryOptions } from '@/api/authApi';
 import { Label } from '@/components/ui/label';
 import { postsApi } from '@/api/postsApi';
 import type { ApiErrorResponse, Category } from '@/constants/types';
@@ -14,8 +13,9 @@ import { fetchCategoriesQueryOptions } from '@/api/categoriesApi';
 import MultiSelect from '@/components/MultiSelect';
 import { createPostSchema } from '@/constants/schema';
 import Tiptap from '@/components/Tiptap';
+import { userQueryOptions } from '@/api/userApi';
 
-export const Route = createFileRoute('/_layout/newPost')({
+export const Route = createFileRoute('/_layout/new-post')({
   component: NewPost,
   beforeLoad: async ({ context }) => {
     const user = await context.queryClient.ensureQueryData(userQueryOptions());
@@ -46,10 +46,10 @@ function NewPost() {
       try {
         const res = await postsApi.createPost(value);
         await queryClient.invalidateQueries({ queryKey: ['posts'] });
-        if (data.status === 'PUBLISHED') {
+        if (res?.data.status === 'PUBLISHED') {
           await navigate({ to: `/post/${res?.data.slug}` });
         } else {
-          await navigate({ to: '/' });
+          await navigate({ to: '/dashboard/draft' });
         }
       } catch (error) {
         if (error instanceof AxiosError && error.response?.data) {
