@@ -27,23 +27,10 @@ function Drafts() {
 
   const { deletePostMutation, isPending } = usePostDelete(POST_STATUSES.DRAFT);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Ready to Publish':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-      case 'In Progress':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-      case 'Outline':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
-    }
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="md:flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Drafts</h1>
           <p className="text-muted-foreground">
@@ -51,8 +38,8 @@ function Drafts() {
           </p>
         </div>
         <Link to="/new-post">
-          <Button className="gap-2">
-            <Edit className="h-4 w-4" />
+          <Button className="gap-2 mt-3">
+            <Edit />
             New Draft
           </Button>
         </Link>
@@ -76,20 +63,20 @@ function Drafts() {
             className="hover:shadow-md transition-all duration-200"
           >
             <CardContent className="p-6">
-              <div className="flex items-start justify-between">
+              <div className="md:flex items-start justify-between space-y-4">
                 <div className="flex-1 space-y-3">
                   <div>
                     <h3 className="text-lg font-semibold hover:text-primary cursor-pointer">
                       {draft.title}
                     </h3>
-                    <p className="text-muted-foreground text-sm mt-1">
+                    <p className="text-muted-foreground text-sm mt-1 line-clamp-3">
                       {getPlainTextPreview(draft.content)}
                     </p>
                   </div>
 
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
+                      <Clock />
                       Last edited{' '}
                       {new Date(draft.updatedAt).toLocaleDateString()}
                     </div>
@@ -98,9 +85,9 @@ function Drafts() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 ml-4">
+                <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm" className="gap-2">
-                    <Edit className="h-4 w-4" />
+                    <Edit />
                     Edit
                   </Button>
                   <Button
@@ -109,7 +96,7 @@ function Drafts() {
                     disabled={isPending}
                     onClick={() => deletePostMutation(draft.id)}
                   >
-                    <Trash2 color="#fff" className="h-4 w-4" />
+                    <Trash2 color="#fff" />
                   </Button>
                 </div>
               </div>

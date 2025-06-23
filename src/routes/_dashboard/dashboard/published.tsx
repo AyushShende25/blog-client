@@ -32,7 +32,7 @@ function PublishedPosts() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="md:flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Published Posts</h1>
           <p className="text-muted-foreground">
@@ -40,9 +40,9 @@ function PublishedPosts() {
           </p>
         </div>
         <Link to="/new-post">
-          <Button className="gap-2">
+          <Button className="gap-2 mt-3">
             <Edit className="h-4 w-4" />
-            New Post
+            <span>New Post</span>
           </Button>
         </Link>
       </div>
@@ -91,7 +91,7 @@ function PublishedPosts() {
           posts.map((post: Post) => (
             <Card key={post.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-6">
-                <div className="flex items-start justify-between">
+                <div className="space-y-4 md:flex items-start justify-between gap-4">
                   <div className="flex-1 space-y-3">
                     <div>
                       <h3 className="text-lg font-semibold hover:text-primary">
@@ -126,7 +126,7 @@ function PublishedPosts() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 ml-4">
+                  <div className="flex items-center gap-2">
                     <Link
                       to="/post/$postSlug"
                       params={{ postSlug: post?.slug }}
