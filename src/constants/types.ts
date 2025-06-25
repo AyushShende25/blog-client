@@ -21,7 +21,7 @@ export type Post = {
 	id: string;
 	images: string[];
 	slug: string;
-	status: "PUBLISHED" | "DRAFT";
+	status: POST_STATUS;
 	title: string;
 	updatedAt: string;
 	coverImage: string;

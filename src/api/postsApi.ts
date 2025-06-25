@@ -42,9 +42,8 @@ export const postsApi = {
 		return res.data;
 	},
 
-
 	fetchPost: async (postSlug: string) => {
-		const res = await api.get(`/posts/${postSlug}`);
+		const res = await api.get(`/posts/slug/${postSlug}`);
 		return res.data;
 	},
 
@@ -73,8 +72,17 @@ export const postsApi = {
 	},
 
 	deletePost: async (postId: string) => {
-		const res = await api.delete(`/posts/${postId}`);
-		console.log(res.data, "deleted");
+		const res = await api.delete(`/posts/id/${postId}`);
+		return res.data;
+	},
+
+	updatePost: async (postId: string, updateValue: CreatePostInput) => {
+		const res = await api.patch(`/posts/id/${postId}`, updateValue);
+		return res.data;
+	},
+
+	getPostById: async (postId: string) => {
+		const res = await api.get(`/posts/id/${postId}`);
 		return res.data;
 	},
 };
@@ -111,3 +119,8 @@ export const fetchUserPostsQueryOptions = (status: POST_STATUS) =>
 		queryFn: () => postsApi.fetchUserPosts(status),
 		staleTime: Number.POSITIVE_INFINITY,
 	});
+
+export const fetchpostByIdQueryOptions = (postId: string) => ({
+	queryKey: ["post", postId],
+	queryFn: () => postsApi.getPostById(postId),
+});

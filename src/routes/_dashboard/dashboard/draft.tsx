@@ -86,10 +86,12 @@ function Drafts() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Edit />
-                    Edit
-                  </Button>
+                  <Link to="/edit-post/$postId" params={{ postId: draft?.id }}>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Edit />
+                      Edit
+                    </Button>
+                  </Link>
                   <Button
                     variant="destructive"
                     size="icon"

@@ -23,14 +23,19 @@ const extensions = [
   }),
 ];
 
-const content = 'start writing...';
+// const content = 'start writing...';
 
 type TiptapProps = {
   onContentChange?: (value: string) => void;
   onImageChange?: (imgSrc: string) => void;
+  content?: string;
 };
 
-function Tiptap({ onContentChange, onImageChange }: TiptapProps) {
+function Tiptap({
+  onContentChange,
+  onImageChange,
+  content = 'start writing...',
+}: TiptapProps) {
   const editor = useEditor({
     extensions,
     content,

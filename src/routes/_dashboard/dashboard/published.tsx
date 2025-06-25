@@ -136,10 +136,12 @@ function PublishedPosts() {
                         View
                       </Button>
                     </Link>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Edit className="h-4 w-4" />
-                      Edit
-                    </Button>
+                    <Link to="/edit-post/$postId" params={{ postId: post?.id }}>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <Edit className="h-4 w-4" />
+                        Edit
+                      </Button>
+                    </Link>
                     <Button
                       variant="destructive"
                       size="icon"

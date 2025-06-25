@@ -21,6 +21,7 @@ import { Route as LayoutSearchImport } from './routes/_layout/search'
 import { Route as LayoutNewPostImport } from './routes/_layout/new-post'
 import { Route as DashboardDashboardIndexImport } from './routes/_dashboard/dashboard/index'
 import { Route as LayoutPostPostSlugImport } from './routes/_layout/post/$postSlug'
+import { Route as LayoutEditPostPostIdImport } from './routes/_layout/edit-post/$postId'
 import { Route as DashboardDashboardPublishedImport } from './routes/_dashboard/dashboard/published'
 import { Route as DashboardDashboardProfileImport } from './routes/_dashboard/dashboard/profile'
 import { Route as DashboardDashboardLibraryImport } from './routes/_dashboard/dashboard/library'
@@ -83,6 +84,12 @@ const DashboardDashboardIndexRoute = DashboardDashboardIndexImport.update({
 const LayoutPostPostSlugRoute = LayoutPostPostSlugImport.update({
   id: '/post/$postSlug',
   path: '/post/$postSlug',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
+const LayoutEditPostPostIdRoute = LayoutEditPostPostIdImport.update({
+  id: '/edit-post/$postId',
+  path: '/edit-post/$postId',
   getParentRoute: () => LayoutRoute,
 } as any)
 
@@ -199,6 +206,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardPublishedImport
       parentRoute: typeof DashboardImport
     }
+    '/_layout/edit-post/$postId': {
+      id: '/_layout/edit-post/$postId'
+      path: '/edit-post/$postId'
+      fullPath: '/edit-post/$postId'
+      preLoaderRoute: typeof LayoutEditPostPostIdImport
+      parentRoute: typeof LayoutImport
+    }
     '/_layout/post/$postSlug': {
       id: '/_layout/post/$postSlug'
       path: '/post/$postSlug'
@@ -242,6 +256,7 @@ interface LayoutRouteChildren {
   LayoutNewPostRoute: typeof LayoutNewPostRoute
   LayoutSearchRoute: typeof LayoutSearchRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
+  LayoutEditPostPostIdRoute: typeof LayoutEditPostPostIdRoute
   LayoutPostPostSlugRoute: typeof LayoutPostPostSlugRoute
 }
 
@@ -249,6 +264,7 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutNewPostRoute: LayoutNewPostRoute,
   LayoutSearchRoute: LayoutSearchRoute,
   LayoutIndexRoute: LayoutIndexRoute,
+  LayoutEditPostPostIdRoute: LayoutEditPostPostIdRoute,
   LayoutPostPostSlugRoute: LayoutPostPostSlugRoute,
 }
 
@@ -267,6 +283,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/library': typeof DashboardDashboardLibraryRoute
   '/dashboard/profile': typeof DashboardDashboardProfileRoute
   '/dashboard/published': typeof DashboardDashboardPublishedRoute
+  '/edit-post/$postId': typeof LayoutEditPostPostIdRoute
   '/post/$postSlug': typeof LayoutPostPostSlugRoute
   '/dashboard': typeof DashboardDashboardIndexRoute
 }
@@ -283,6 +300,7 @@ export interface FileRoutesByTo {
   '/dashboard/library': typeof DashboardDashboardLibraryRoute
   '/dashboard/profile': typeof DashboardDashboardProfileRoute
   '/dashboard/published': typeof DashboardDashboardPublishedRoute
+  '/edit-post/$postId': typeof LayoutEditPostPostIdRoute
   '/post/$postSlug': typeof LayoutPostPostSlugRoute
   '/dashboard': typeof DashboardDashboardIndexRoute
 }
@@ -301,6 +319,7 @@ export interface FileRoutesById {
   '/_dashboard/dashboard/library': typeof DashboardDashboardLibraryRoute
   '/_dashboard/dashboard/profile': typeof DashboardDashboardProfileRoute
   '/_dashboard/dashboard/published': typeof DashboardDashboardPublishedRoute
+  '/_layout/edit-post/$postId': typeof LayoutEditPostPostIdRoute
   '/_layout/post/$postSlug': typeof LayoutPostPostSlugRoute
   '/_dashboard/dashboard/': typeof DashboardDashboardIndexRoute
 }
@@ -319,6 +338,7 @@ export interface FileRouteTypes {
     | '/dashboard/library'
     | '/dashboard/profile'
     | '/dashboard/published'
+    | '/edit-post/$postId'
     | '/post/$postSlug'
     | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
@@ -334,6 +354,7 @@ export interface FileRouteTypes {
     | '/dashboard/library'
     | '/dashboard/profile'
     | '/dashboard/published'
+    | '/edit-post/$postId'
     | '/post/$postSlug'
     | '/dashboard'
   id:
@@ -350,6 +371,7 @@ export interface FileRouteTypes {
     | '/_dashboard/dashboard/library'
     | '/_dashboard/dashboard/profile'
     | '/_dashboard/dashboard/published'
+    | '/_layout/edit-post/$postId'
     | '/_layout/post/$postSlug'
     | '/_dashboard/dashboard/'
   fileRoutesById: FileRoutesById
@@ -404,6 +426,7 @@ export const routeTree = rootRoute
         "/_layout/new-post",
         "/_layout/search",
         "/_layout/",
+        "/_layout/edit-post/$postId",
         "/_layout/post/$postSlug"
       ]
     },
@@ -443,6 +466,10 @@ export const routeTree = rootRoute
     "/_dashboard/dashboard/published": {
       "filePath": "_dashboard/dashboard/published.tsx",
       "parent": "/_dashboard"
+    },
+    "/_layout/edit-post/$postId": {
+      "filePath": "_layout/edit-post/$postId.tsx",
+      "parent": "/_layout"
     },
     "/_layout/post/$postSlug": {
       "filePath": "_layout/post/$postSlug.tsx",
