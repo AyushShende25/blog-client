@@ -3,10 +3,11 @@ import { RouterProvider, createRouter } from '@tanstack/react-router';
 import ReactDOM from 'react-dom/client';
 import { Loader2Icon } from 'lucide-react';
 import { routeTree } from './routeTree.gen';
-import './index.css'
+import './index.css';
 
 import NotFound from '@/components/not-found';
 import ErrorComponent from '@/components/error-component';
+import BouncingLoader from './components/BouncingLoader';
 
 const queryClient = new QueryClient();
 
@@ -16,14 +17,9 @@ const router = createRouter({
   context: { queryClient },
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 0,
-  defaultPendingComponent:() => (
-    <div className='flex-center flex-col mx-auto mt-8'>
-      <Loader2Icon className='animate-spin' />
-      <p className='mt-2 text-sm text-muted-foreground'>Loading...</p>
-    </div>
-  ),
+  defaultPendingComponent: () => <BouncingLoader />,
   defaultNotFoundComponent: NotFound,
-  defaultErrorComponent: ({error})=><ErrorComponent error={error} />
+  defaultErrorComponent: ({ error }) => <ErrorComponent error={error} />,
 });
 
 // Register things for typesafety
