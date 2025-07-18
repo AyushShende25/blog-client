@@ -1,8 +1,10 @@
-import { api } from "@/api/axiosInstance";
 import { queryOptions } from "@tanstack/react-query";
 
-export const userApi = {	
-  getMe: async () => {
+import { api } from "@/api/axiosInstance";
+import type { User } from "@/constants/types";
+
+export const userApi = {
+	getMe: async (): Promise<User | null> => {
 		try {
 			const res = await api.get("/users/me");
 			return res.data.data;
@@ -20,6 +22,11 @@ export const userApi = {
 	},
 	unsavePost: async (postId: string) => {
 		const res = await api.delete(`/users/saved/${postId}`);
+		return res.data;
+	},
+
+	updateUserAvatar: async (avatarUrl: string) => {
+		const res = await api.post("/users/update-avatar", { avatarUrl });
 		return res.data;
 	},
 };

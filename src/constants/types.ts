@@ -64,4 +64,5 @@ export type User = {
 	role: ROLE;
 	updatedAt: string;
 	username: string;
+	avatarUrl: string | null;
 };
