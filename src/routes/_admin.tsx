@@ -4,24 +4,29 @@ import {
 	createFileRoute,
 	redirect,
 } from "@tanstack/react-router";
-import { PenTool } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
 
 import { userQueryOptions } from "@/api/userApi";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { DashboardNavItems } from "@/constants";
+import { AdminNavItems } from "@/constants";
 
-export const Route = createFileRoute("/_dashboard")({
-	component: DashboardLayout,
+export const Route = createFileRoute("/_admin")({
+	component: RouteComponent,
 	beforeLoad: async ({ context }) => {
 		const user = await context.queryClient.ensureQueryData(userQueryOptions());
 		if (!user) {
 			throw redirect({ to: "/login" });
 		}
+		if (user.role !== "ADMIN") {
+			toast.error("Not Enough Permissions");
+			throw redirect({ to: "/" });
+		}
 	},
 });
 
-function DashboardLayout() {
+function RouteComponent() {
 	return (
 		<div className="max-container min-h-screen">
 			<SidebarProvider className="block overflow-x-hidden w-full">
@@ -30,7 +35,7 @@ function DashboardLayout() {
 						<div className="flex h-16 items-center justify-between px-2 md:px-6">
 							<SidebarTrigger />
 							<div className="flex items-center gap-2">
-								<PenTool />
+								<ShieldCheck />
 								<h1 className="text-xl font-semibold">Dashboard</h1>
 							</div>
 
@@ -46,7 +51,7 @@ function DashboardLayout() {
 					</header>
 
 					<div className="flex flex-1 overflow-hidden">
-						<DashboardSidebar navigationItems={DashboardNavItems} />
+						<DashboardSidebar navigationItems={AdminNavItems} />
 						<main className="flex-1 p-6 overflow-y-auto">
 							<Outlet />
 						</main>

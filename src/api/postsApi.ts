@@ -1,7 +1,7 @@
 import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
 
-import type { CreatePostInput, Post, POST_STATUS } from "@/constants/types";
 import { api } from "@/api/axiosInstance";
+import type { CreatePostInput, POST_STATUS, Post } from "@/constants/types";
 
 interface PostListResponse {
 	data: Post[];

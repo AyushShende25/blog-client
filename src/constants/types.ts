@@ -1,11 +1,11 @@
-// biome-ignore lint/style/useImportType: <explanation>
-import { z } from "zod";
 import type {
 	createPostSchema,
 	loginSchema,
 	signupSchema,
 	verifyEmailSchema,
 } from "@/constants/schema";
+// biome-ignore lint/style/useImportType: <explanation>
+import { z } from "zod";
 
 export interface ApiErrorResponse {
 	success: false;

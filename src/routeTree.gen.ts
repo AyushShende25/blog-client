@@ -16,16 +16,22 @@ import { Route as SignupImport } from './routes/signup'
 import { Route as LoginImport } from './routes/login'
 import { Route as LayoutImport } from './routes/_layout'
 import { Route as DashboardImport } from './routes/_dashboard'
+import { Route as AdminImport } from './routes/_admin'
 import { Route as LayoutIndexImport } from './routes/_layout/index'
 import { Route as LayoutSearchImport } from './routes/_layout/search'
 import { Route as LayoutNewPostImport } from './routes/_layout/new-post'
 import { Route as DashboardDashboardIndexImport } from './routes/_dashboard/dashboard/index'
+import { Route as AdminAdminIndexImport } from './routes/_admin/admin/index'
 import { Route as LayoutPostPostSlugImport } from './routes/_layout/post/$postSlug'
 import { Route as LayoutEditPostPostIdImport } from './routes/_layout/edit-post/$postId'
 import { Route as DashboardDashboardPublishedImport } from './routes/_dashboard/dashboard/published'
 import { Route as DashboardDashboardProfileImport } from './routes/_dashboard/dashboard/profile'
 import { Route as DashboardDashboardLibraryImport } from './routes/_dashboard/dashboard/library'
 import { Route as DashboardDashboardDraftImport } from './routes/_dashboard/dashboard/draft'
+import { Route as AdminAdminUsersImport } from './routes/_admin/admin/users'
+import { Route as AdminAdminPostsImport } from './routes/_admin/admin/posts'
+import { Route as AdminAdminCategoriesImport } from './routes/_admin/admin/categories'
+import { Route as AdminAdminAnalyticsImport } from './routes/_admin/admin/analytics'
 
 // Create/Update Routes
 
@@ -57,6 +63,11 @@ const DashboardRoute = DashboardImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AdminRoute = AdminImport.update({
+  id: '/_admin',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const LayoutIndexRoute = LayoutIndexImport.update({
   id: '/',
   path: '/',
@@ -79,6 +90,12 @@ const DashboardDashboardIndexRoute = DashboardDashboardIndexImport.update({
   id: '/dashboard/',
   path: '/dashboard/',
   getParentRoute: () => DashboardRoute,
+} as any)
+
+const AdminAdminIndexRoute = AdminAdminIndexImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AdminRoute,
 } as any)
 
 const LayoutPostPostSlugRoute = LayoutPostPostSlugImport.update({
@@ -118,10 +135,41 @@ const DashboardDashboardDraftRoute = DashboardDashboardDraftImport.update({
   getParentRoute: () => DashboardRoute,
 } as any)
 
+const AdminAdminUsersRoute = AdminAdminUsersImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+
+const AdminAdminPostsRoute = AdminAdminPostsImport.update({
+  id: '/admin/posts',
+  path: '/admin/posts',
+  getParentRoute: () => AdminRoute,
+} as any)
+
+const AdminAdminCategoriesRoute = AdminAdminCategoriesImport.update({
+  id: '/admin/categories',
+  path: '/admin/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
+
+const AdminAdminAnalyticsRoute = AdminAdminAnalyticsImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
+  getParentRoute: () => AdminRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_admin': {
+      id: '/_admin'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AdminImport
+      parentRoute: typeof rootRoute
+    }
     '/_dashboard': {
       id: '/_dashboard'
       path: ''
@@ -178,6 +226,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutIndexImport
       parentRoute: typeof LayoutImport
     }
+    '/_admin/admin/analytics': {
+      id: '/_admin/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAdminAnalyticsImport
+      parentRoute: typeof AdminImport
+    }
+    '/_admin/admin/categories': {
+      id: '/_admin/admin/categories'
+      path: '/admin/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminAdminCategoriesImport
+      parentRoute: typeof AdminImport
+    }
+    '/_admin/admin/posts': {
+      id: '/_admin/admin/posts'
+      path: '/admin/posts'
+      fullPath: '/admin/posts'
+      preLoaderRoute: typeof AdminAdminPostsImport
+      parentRoute: typeof AdminImport
+    }
+    '/_admin/admin/users': {
+      id: '/_admin/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminAdminUsersImport
+      parentRoute: typeof AdminImport
+    }
     '/_dashboard/dashboard/draft': {
       id: '/_dashboard/dashboard/draft'
       path: '/dashboard/draft'
@@ -220,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutPostPostSlugImport
       parentRoute: typeof LayoutImport
     }
+    '/_admin/admin/': {
+      id: '/_admin/admin/'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminAdminIndexImport
+      parentRoute: typeof AdminImport
+    }
     '/_dashboard/dashboard/': {
       id: '/_dashboard/dashboard/'
       path: '/dashboard'
@@ -231,6 +314,24 @@ declare module '@tanstack/react-router' {
 }
 
 // Create and export the route tree
+
+interface AdminRouteChildren {
+  AdminAdminAnalyticsRoute: typeof AdminAdminAnalyticsRoute
+  AdminAdminCategoriesRoute: typeof AdminAdminCategoriesRoute
+  AdminAdminPostsRoute: typeof AdminAdminPostsRoute
+  AdminAdminUsersRoute: typeof AdminAdminUsersRoute
+  AdminAdminIndexRoute: typeof AdminAdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdminAnalyticsRoute: AdminAdminAnalyticsRoute,
+  AdminAdminCategoriesRoute: AdminAdminCategoriesRoute,
+  AdminAdminPostsRoute: AdminAdminPostsRoute,
+  AdminAdminUsersRoute: AdminAdminUsersRoute,
+  AdminAdminIndexRoute: AdminAdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface DashboardRouteChildren {
   DashboardDashboardDraftRoute: typeof DashboardDashboardDraftRoute
@@ -279,12 +380,17 @@ export interface FileRoutesByFullPath {
   '/new-post': typeof LayoutNewPostRoute
   '/search': typeof LayoutSearchRoute
   '/': typeof LayoutIndexRoute
+  '/admin/analytics': typeof AdminAdminAnalyticsRoute
+  '/admin/categories': typeof AdminAdminCategoriesRoute
+  '/admin/posts': typeof AdminAdminPostsRoute
+  '/admin/users': typeof AdminAdminUsersRoute
   '/dashboard/draft': typeof DashboardDashboardDraftRoute
   '/dashboard/library': typeof DashboardDashboardLibraryRoute
   '/dashboard/profile': typeof DashboardDashboardProfileRoute
   '/dashboard/published': typeof DashboardDashboardPublishedRoute
   '/edit-post/$postId': typeof LayoutEditPostPostIdRoute
   '/post/$postSlug': typeof LayoutPostPostSlugRoute
+  '/admin': typeof AdminAdminIndexRoute
   '/dashboard': typeof DashboardDashboardIndexRoute
 }
 
@@ -296,17 +402,23 @@ export interface FileRoutesByTo {
   '/new-post': typeof LayoutNewPostRoute
   '/search': typeof LayoutSearchRoute
   '/': typeof LayoutIndexRoute
+  '/admin/analytics': typeof AdminAdminAnalyticsRoute
+  '/admin/categories': typeof AdminAdminCategoriesRoute
+  '/admin/posts': typeof AdminAdminPostsRoute
+  '/admin/users': typeof AdminAdminUsersRoute
   '/dashboard/draft': typeof DashboardDashboardDraftRoute
   '/dashboard/library': typeof DashboardDashboardLibraryRoute
   '/dashboard/profile': typeof DashboardDashboardProfileRoute
   '/dashboard/published': typeof DashboardDashboardPublishedRoute
   '/edit-post/$postId': typeof LayoutEditPostPostIdRoute
   '/post/$postSlug': typeof LayoutPostPostSlugRoute
+  '/admin': typeof AdminAdminIndexRoute
   '/dashboard': typeof DashboardDashboardIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
+  '/_admin': typeof AdminRouteWithChildren
   '/_dashboard': typeof DashboardRouteWithChildren
   '/_layout': typeof LayoutRouteWithChildren
   '/login': typeof LoginRoute
@@ -315,12 +427,17 @@ export interface FileRoutesById {
   '/_layout/new-post': typeof LayoutNewPostRoute
   '/_layout/search': typeof LayoutSearchRoute
   '/_layout/': typeof LayoutIndexRoute
+  '/_admin/admin/analytics': typeof AdminAdminAnalyticsRoute
+  '/_admin/admin/categories': typeof AdminAdminCategoriesRoute
+  '/_admin/admin/posts': typeof AdminAdminPostsRoute
+  '/_admin/admin/users': typeof AdminAdminUsersRoute
   '/_dashboard/dashboard/draft': typeof DashboardDashboardDraftRoute
   '/_dashboard/dashboard/library': typeof DashboardDashboardLibraryRoute
   '/_dashboard/dashboard/profile': typeof DashboardDashboardProfileRoute
   '/_dashboard/dashboard/published': typeof DashboardDashboardPublishedRoute
   '/_layout/edit-post/$postId': typeof LayoutEditPostPostIdRoute
   '/_layout/post/$postSlug': typeof LayoutPostPostSlugRoute
+  '/_admin/admin/': typeof AdminAdminIndexRoute
   '/_dashboard/dashboard/': typeof DashboardDashboardIndexRoute
 }
 
@@ -334,12 +451,17 @@ export interface FileRouteTypes {
     | '/new-post'
     | '/search'
     | '/'
+    | '/admin/analytics'
+    | '/admin/categories'
+    | '/admin/posts'
+    | '/admin/users'
     | '/dashboard/draft'
     | '/dashboard/library'
     | '/dashboard/profile'
     | '/dashboard/published'
     | '/edit-post/$postId'
     | '/post/$postSlug'
+    | '/admin'
     | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -350,15 +472,21 @@ export interface FileRouteTypes {
     | '/new-post'
     | '/search'
     | '/'
+    | '/admin/analytics'
+    | '/admin/categories'
+    | '/admin/posts'
+    | '/admin/users'
     | '/dashboard/draft'
     | '/dashboard/library'
     | '/dashboard/profile'
     | '/dashboard/published'
     | '/edit-post/$postId'
     | '/post/$postSlug'
+    | '/admin'
     | '/dashboard'
   id:
     | '__root__'
+    | '/_admin'
     | '/_dashboard'
     | '/_layout'
     | '/login'
@@ -367,17 +495,23 @@ export interface FileRouteTypes {
     | '/_layout/new-post'
     | '/_layout/search'
     | '/_layout/'
+    | '/_admin/admin/analytics'
+    | '/_admin/admin/categories'
+    | '/_admin/admin/posts'
+    | '/_admin/admin/users'
     | '/_dashboard/dashboard/draft'
     | '/_dashboard/dashboard/library'
     | '/_dashboard/dashboard/profile'
     | '/_dashboard/dashboard/published'
     | '/_layout/edit-post/$postId'
     | '/_layout/post/$postSlug'
+    | '/_admin/admin/'
     | '/_dashboard/dashboard/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
+  AdminRoute: typeof AdminRouteWithChildren
   DashboardRoute: typeof DashboardRouteWithChildren
   LayoutRoute: typeof LayoutRouteWithChildren
   LoginRoute: typeof LoginRoute
@@ -386,6 +520,7 @@ export interface RootRouteChildren {
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  AdminRoute: AdminRouteWithChildren,
   DashboardRoute: DashboardRouteWithChildren,
   LayoutRoute: LayoutRouteWithChildren,
   LoginRoute: LoginRoute,
@@ -403,11 +538,22 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
+        "/_admin",
         "/_dashboard",
         "/_layout",
         "/login",
         "/signup",
         "/verify-email"
+      ]
+    },
+    "/_admin": {
+      "filePath": "_admin.tsx",
+      "children": [
+        "/_admin/admin/analytics",
+        "/_admin/admin/categories",
+        "/_admin/admin/posts",
+        "/_admin/admin/users",
+        "/_admin/admin/"
       ]
     },
     "/_dashboard": {
@@ -451,6 +597,22 @@ export const routeTree = rootRoute
       "filePath": "_layout/index.tsx",
       "parent": "/_layout"
     },
+    "/_admin/admin/analytics": {
+      "filePath": "_admin/admin/analytics.tsx",
+      "parent": "/_admin"
+    },
+    "/_admin/admin/categories": {
+      "filePath": "_admin/admin/categories.tsx",
+      "parent": "/_admin"
+    },
+    "/_admin/admin/posts": {
+      "filePath": "_admin/admin/posts.tsx",
+      "parent": "/_admin"
+    },
+    "/_admin/admin/users": {
+      "filePath": "_admin/admin/users.tsx",
+      "parent": "/_admin"
+    },
     "/_dashboard/dashboard/draft": {
       "filePath": "_dashboard/dashboard/draft.tsx",
       "parent": "/_dashboard"
@@ -474,6 +636,10 @@ export const routeTree = rootRoute
     "/_layout/post/$postSlug": {
       "filePath": "_layout/post/$postSlug.tsx",
       "parent": "/_layout"
+    },
+    "/_admin/admin/": {
+      "filePath": "_admin/admin/index.tsx",
+      "parent": "/_admin"
     },
     "/_dashboard/dashboard/": {
       "filePath": "_dashboard/dashboard/index.tsx",

@@ -1,11 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 
+import { userQueryOptions } from "@/api/userApi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ROLES, type User } from "@/constants/types";
-import { userQueryOptions } from "@/api/userApi";
 import useAvatarUpdate from "@/hooks/useAvatarUpdate";
 
 export const Route = createFileRoute("/_dashboard/dashboard/profile")({

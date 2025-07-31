@@ -1,24 +1,24 @@
 import { fetchCategoriesQueryOptions } from "@/api/categoriesApi";
+import { imageApi } from "@/api/imageApi";
 import { postsApi } from "@/api/postsApi";
 import { createPostSchema } from "@/constants/schema";
 import {
-	POST_STATUSES,
 	type ApiErrorResponse,
 	type Category,
-	type Post,
 	type POST_STATUS,
+	POST_STATUSES,
+	type Post,
 } from "@/constants/types";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
-import { Button } from "./ui/button";
-import { Label } from "./ui/label";
 import MultiSelect from "./MultiSelect";
-import { Input } from "./ui/input";
 import Tiptap from "./Tiptap";
-import { imageApi } from "@/api/imageApi";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 type PostFormProps = {
 	mode: "create" | "edit";

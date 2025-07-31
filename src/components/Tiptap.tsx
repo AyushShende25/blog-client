@@ -1,11 +1,11 @@
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
 
-import TiptapMenuBar from "@/components/TiptapMenubar";
 import { imageApi } from "@/api/imageApi";
+import TiptapMenuBar from "@/components/TiptapMenubar";
 
 const extensions = [
 	StarterKit,

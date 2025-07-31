@@ -3,10 +3,11 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { userQueryOptions } from "@/api/userApi";
 import Logo from "@/components/Logo";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -14,8 +15,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ModeToggle } from "@/components/mode-toggle";
-import { userQueryOptions } from "@/api/userApi";
+import { Input } from "@/components/ui/input";
 import useLogout from "@/hooks/useLogout";
 
 function Header() {
@@ -129,6 +129,11 @@ function Header() {
 									<Link to="/dashboard">
 										<DropdownMenuItem>Dashboard</DropdownMenuItem>
 									</Link>
+									{user.role === "ADMIN" ? (
+										<Link to="/admin">
+											<DropdownMenuItem>Admin Dashboard</DropdownMenuItem>
+										</Link>
+									) : null}
 									<DropdownMenuSeparator />
 									<DropdownMenuItem onClick={() => logoutMutation()}>
 										Logout
