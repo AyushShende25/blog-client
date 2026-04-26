@@ -1,28 +1,53 @@
 import { queryOptions } from "@tanstack/react-query";
+import { axiosInstance } from "@/api/axiosInstance";
+import { QueryStaleTime } from "@/constants";
+import type { Category } from "@/constants/types";
 
-import { api } from "@/api/axiosInstance";
+export type CategoryListResponse = { categories: Category[] };
+
+export type CategoryResponse = { category: Category };
+
+export type CreateCategoryInput = {
+	name: string;
+};
+export type UpdateCategoryInput = {
+	name: string;
+};
 
 export const categoriesApi = {
-	fetchFeaturedCategories: async () => {
-		const res = await api.get("/categories/featured");
-		return res.data;
+	fetchAllCategories: async (): Promise<Category[]> => {
+		const res = await axiosInstance.get<CategoryListResponse>("/categories");
+		return res.data.categories;
 	},
-	fetchAllCategories: async () => {
-		const res = await api.get("/categories");
-		return res.data;
+	createCategory: async (input: CreateCategoryInput): Promise<Category> => {
+		const res = await axiosInstance.post<CategoryResponse>(
+			"/categories",
+			input,
+		);
+		return res.data.category;
+	},
+	updateCategory: async (
+		id: string,
+		input: UpdateCategoryInput,
+	): Promise<Category> => {
+		const res = await axiosInstance.patch<CategoryResponse>(
+			`/categories/${id}`,
+			input,
+		);
+		return res.data.category;
+	},
+	deleteCategory: async (id: string): Promise<void> => {
+		await axiosInstance.delete(`/categories/${id}`);
 	},
 };
 
-export const fetchFeaturedCategoriesQueryOptions = () =>
-	queryOptions({
-		queryKey: ["categories", "featured"],
-		queryFn: () => categoriesApi.fetchFeaturedCategories(),
-		staleTime: Number.POSITIVE_INFINITY,
-	});
+export const categoryKeys = {
+	all: ["categories"] as const,
+};
 
 export const fetchCategoriesQueryOptions = () =>
 	queryOptions({
-		queryKey: ["categories"],
-		queryFn: () => categoriesApi.fetchAllCategories(),
-		staleTime: Number.POSITIVE_INFINITY,
+		queryKey: categoryKeys.all,
+		queryFn: categoriesApi.fetchAllCategories,
+		staleTime: QueryStaleTime,
 	});

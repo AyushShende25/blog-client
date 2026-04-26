@@ -1,10 +1,51 @@
-import { infiniteQueryOptions, queryOptions } from "@tanstack/react-query";
+import {
+	infiniteQueryOptions,
+	queryOptions,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { axiosInstance } from "@/api/axiosInstance";
+import type { Post, PostStatus } from "@/constants/types";
+import { QueryStaleTime } from "@/constants";
+import { toast } from "sonner";
+import { handleApiError } from "@/lib/utils";
 
-import { api } from "@/api/axiosInstance";
-import type { CreatePostInput, POST_STATUS, Post } from "@/constants/types";
+type FetchPostsParams = FetchPostsFilters & {
+	page: number;
+	dateFrom?: Date;
+	dateTo?: Date;
+};
 
-interface PostListResponse {
-	data: Post[];
+type FetchPostsFilters = {
+	category?: string[];
+	tag?: string[];
+	search?: string;
+	sort?: string;
+	limit?: number;
+};
+
+type CreatePostInput = {
+	title: string;
+	content?: string;
+	status: PostStatus;
+	categories: string[];
+	tags: string[];
+	media?: string[];
+	coverImage?: string;
+};
+
+type UpdatePostInput = {
+	title?: string;
+	content?: string;
+	status?: PostStatus;
+	categories?: string[];
+	tags?: string[];
+	media?: string[];
+	coverImage?: string;
+};
+
+type FetchPostsResponse = {
+	posts: Post[];
 	meta: {
 		totalPages: number;
 		page: number;
@@ -13,99 +54,256 @@ interface PostListResponse {
 		hasNextPage: boolean;
 		hasPreviousPage: boolean;
 	};
-}
+};
 
-interface PostListParams {
-	pageParam: number;
-	filter?: string;
-	sort?: string;
-	category?: string;
-}
+type PostResponse = {
+	post: Post;
+};
+
+type CreatePostResponse = {
+	post: Post;
+	message: string;
+};
+
+type FetchBookmarksResponse = {
+	posts: Post[];
+};
+
+type BookmarkPostResponse = {
+	message: string;
+	postId: string;
+};
 
 export const postsApi = {
-	fetchPostList: async ({
-		pageParam,
-		filter,
-		sort,
-		category,
-	}: PostListParams): Promise<PostListResponse> => {
-		const query = new URLSearchParams({
-			limit: "10",
-			page: String(pageParam),
-			...(filter && { filter }),
-			...(sort && { sort }),
-			...(category && { category }),
-		}).toString();
-
-		const res = await api.get(`/posts?${query}`);
+	fetchPosts: async (params: FetchPostsParams): Promise<FetchPostsResponse> => {
+		const res = await axiosInstance.get<FetchPostsResponse>("/posts", {
+			params: {
+				...params,
+				dateFrom: params.dateFrom?.toISOString(),
+				dateTo: params.dateTo?.toISOString(),
+			},
+		});
 		return res.data;
 	},
-
-	fetchPost: async (postSlug: string) => {
-		const res = await api.get(`/posts/slug/${postSlug}`);
+	fetchPost: async (slug: string): Promise<PostResponse> => {
+		const res = await axiosInstance.get<PostResponse>(`/posts/slug/${slug}`);
 		return res.data;
 	},
-
-	createPost: async (createPostInput: CreatePostInput) => {
-		const res = await api.post("/posts", createPostInput);
+	fetchUserPosts: async (username: string): Promise<FetchPostsResponse> => {
+		const res = await axiosInstance.get<FetchPostsResponse>(
+			`/posts/author/${username}`,
+		);
 		return res.data;
 	},
-
-	fetchUserPosts: async (status: POST_STATUS) => {
-		const res = await api.get(`/posts/user?status=${status}`);
+	createPost: async (input: CreatePostInput): Promise<PostResponse> => {
+		const res = await axiosInstance.post<CreatePostResponse>("/posts", input);
 		return res.data;
 	},
-
-	deletePost: async (postId: string) => {
-		const res = await api.delete(`/posts/id/${postId}`);
+	fetchMyPosts: async (
+		params: FetchPostsParams & { status?: PostStatus },
+	): Promise<FetchPostsResponse> => {
+		const res = await axiosInstance.get<FetchPostsResponse>(`/posts/me`, {
+			params: {
+				...params,
+				dateFrom: params.dateFrom?.toISOString(),
+				dateTo: params.dateTo?.toISOString(),
+			},
+		});
 		return res.data;
 	},
-
-	updatePost: async (postId: string, updateValue: CreatePostInput) => {
-		const res = await api.patch(`/posts/id/${postId}`, updateValue);
+	fetchBookmarks: async (): Promise<FetchBookmarksResponse> => {
+		const res =
+			await axiosInstance.get<FetchBookmarksResponse>(`/posts/me/bookmarks`);
 		return res.data;
 	},
-
-	getPostById: async (postId: string) => {
-		const res = await api.get(`/posts/id/${postId}`);
+	bookmarkPost: async (postId: string): Promise<BookmarkPostResponse> => {
+		const res = await axiosInstance.put<BookmarkPostResponse>(
+			`/posts/${postId}/bookmark`,
+		);
+		return res.data;
+	},
+	unbookmarkPost: async (postId: string): Promise<BookmarkPostResponse> => {
+		const res = await axiosInstance.delete<BookmarkPostResponse>(
+			`/posts/${postId}/bookmark`,
+		);
+		return res.data;
+	},
+	deletePost: async (postId: string): Promise<void> => {
+		await axiosInstance.delete(`/posts/${postId}`);
+	},
+	fetchPostById: async (postId: string): Promise<PostResponse> => {
+		const res = await axiosInstance.get<PostResponse>(`/posts/${postId}`);
+		return res.data;
+	},
+	updatePost: async (
+		postId: string,
+		input: UpdatePostInput,
+	): Promise<PostResponse> => {
+		const res = await axiosInstance.patch<PostResponse>(
+			`/posts/${postId}`,
+			input,
+		);
 		return res.data;
 	},
 };
 
-export const fetchPostListQueryOptions = (
-	category = "",
-	filter = "",
-	sort = "",
-) =>
+export const postKeys = {
+	all: ["posts"] as const,
+	published: (filters: FetchPostsFilters) =>
+		[...postKeys.all, "published", filters] as const,
+	user: (username: string) => [...postKeys.all, "user", username] as const,
+	myPosts: (filters: FetchPostsFilters & { status?: PostStatus }) =>
+		[...postKeys.all, "me", filters] as const,
+	bookmarks: () => [...postKeys.all, "bookmarks"] as const,
+	post: (slug: string) => ["post", slug] as const,
+	postById: (id: string) => ["post", id] as const,
+};
+
+export const fetchPostsQueryOptions = ({
+	category,
+	tag,
+	search,
+	sort = "createdAt:desc",
+	limit = 10,
+}: FetchPostsFilters) =>
 	infiniteQueryOptions({
-		queryKey: ["posts", category, sort, filter],
-		queryFn: ({ pageParam }) =>
-			postsApi.fetchPostList({ pageParam, category, sort, filter }),
+		queryKey: postKeys.published({ category, tag, search, sort, limit }),
+		queryFn: ({ pageParam = 1 }) =>
+			postsApi.fetchPosts({
+				page: pageParam,
+				limit,
+				category,
+				tag,
+				search,
+				sort,
+			}),
 		initialPageParam: 1,
-		getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-			if (lastPageParam >= lastPage.meta.totalPages) {
-				return undefined;
-			}
-			return lastPageParam + 1;
+		getNextPageParam: (lastPage) =>
+			lastPage.meta.hasNextPage ? lastPage.meta.page + 1 : undefined,
+		staleTime: QueryStaleTime,
+	});
+
+export const fetchPostQueryOptions = (slug: string) =>
+	queryOptions({
+		queryKey: postKeys.post(slug),
+		queryFn: () => postsApi.fetchPost(slug),
+		staleTime: QueryStaleTime,
+		enabled: !!slug,
+	});
+
+export const fetchPostByIdQueryOptions = (postId: string) =>
+	queryOptions({
+		queryKey: postKeys.postById(postId),
+		queryFn: () => postsApi.fetchPostById(postId),
+		staleTime: QueryStaleTime,
+	});
+
+export const fetchUserPostsQueryOptions = (username: string) =>
+	queryOptions({
+		queryKey: postKeys.user(username),
+		queryFn: () => postsApi.fetchUserPosts(username),
+		staleTime: QueryStaleTime,
+		enabled: !!username,
+	});
+
+export const fetchMyPostsQueryOptions = ({
+	status,
+	search,
+	category,
+	tag,
+	sort = "createdAt:desc",
+	limit = 10,
+}: FetchPostsFilters & { status?: PostStatus }) =>
+	infiniteQueryOptions({
+		queryKey: postKeys.myPosts({ status, search, category, tag, sort, limit }),
+		queryFn: ({ pageParam = 1 }) =>
+			postsApi.fetchMyPosts({
+				page: pageParam,
+				limit,
+				status,
+				search,
+				category,
+				tag,
+				sort,
+			}),
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) =>
+			lastPage.meta.hasNextPage ? lastPage.meta.page + 1 : undefined,
+		staleTime: QueryStaleTime,
+	});
+
+export const fetchBookmarksQueryOptions = () =>
+	queryOptions({
+		queryKey: postKeys.bookmarks(),
+		queryFn: () => postsApi.fetchBookmarks(),
+		staleTime: QueryStaleTime,
+	});
+
+export function useCreatePost() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: postsApi.createPost,
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: postKeys.all,
+			});
 		},
-		staleTime: Number.POSITIVE_INFINITY,
+		onError: handleApiError,
 	});
+}
 
-export const fetchPostQueryOptions = (postSlug: string) =>
-	queryOptions({
-		queryKey: ["post", postSlug],
-		queryFn: () => postsApi.fetchPost(postSlug),
-		staleTime: Number.POSITIVE_INFINITY,
+export function useBookmarkPost() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (postId: string) => postsApi.bookmarkPost(postId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: postKeys.bookmarks() });
+			toast.success("Post added to bookmarks");
+		},
+		onError: handleApiError,
 	});
+}
 
-export const fetchUserPostsQueryOptions = (status: POST_STATUS) =>
-	queryOptions({
-		queryKey: ["posts", "user", { status }],
-		queryFn: () => postsApi.fetchUserPosts(status),
-		staleTime: Number.POSITIVE_INFINITY,
+export function useUnBookmarkPost() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (postId: string) => postsApi.unbookmarkPost(postId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: postKeys.bookmarks() });
+			toast.success("Post removed from bookmarks");
+		},
+		onError: handleApiError,
 	});
+}
 
-export const fetchpostByIdQueryOptions = (postId: string) => ({
-	queryKey: ["post", postId],
-	queryFn: () => postsApi.getPostById(postId),
-});
+export function useUpdatePost() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({
+			postId,
+			input,
+		}: {
+			postId: string;
+			input: UpdatePostInput;
+		}) => postsApi.updatePost(postId, input),
+		onSuccess: async (_data, { postId }) => {
+			await Promise.all([
+				queryClient.invalidateQueries({ queryKey: postKeys.postById(postId) }),
+				queryClient.invalidateQueries({ queryKey: postKeys.all }),
+			]);
+		},
+		onError: handleApiError,
+	});
+}
+
+export function useDeletePost() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (postId: string) => postsApi.deletePost(postId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: postKeys.all });
+			toast.success("Post deleted successfully");
+		},
+		onError: handleApiError,
+	});
+}

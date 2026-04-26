@@ -1,43 +1,59 @@
-import { api } from "@/api/axiosInstance";
-import type { LoginInput } from "@/constants/types";
-import type { SignupInput } from "@/constants/types";
-import type { VerifyEmailInput } from "@/constants/types";
+import { axiosInstance } from "@/api/axiosInstance";
+import { QueryStaleTime } from "@/constants";
+import type { LoginFormInput, SignupFormInput } from "@/constants/schema";
+import type { User } from "@/constants/types";
 
-export const authApi = {
-	signup: async (credentials: SignupInput) => {
-		const res = await api.post("/auth/signup", credentials);
-		return res.data;
-	},
-	login: async (credentials: LoginInput) => {
-		const res = await api.post("/auth/login", credentials);
-		return res.data;
-	},
-	verifyEmail: async (data: VerifyEmailInput) => {
-		const res = await api.post("/auth/verify-email", data);
-		return res.data;
-	},
-	logout: async () => {
-		const res = await api.post("/auth/logout");
-		return res.data;
-	},
-	refreshAccessToken: async () => {
-		const res = await api.post("/auth/refresh");
-		return res.data;
-	},
+import { queryOptions } from "@tanstack/react-query";
+import axios from "axios";
+
+type AuthResponse = {
+	message: string;
 };
 
-api.interceptors.response.use(
-	(response) => {
-		return response;
+export const authApi = {
+	signup: async (input: SignupFormInput): Promise<AuthResponse> => {
+		const res = await axiosInstance.post<AuthResponse>("/auth/signup", input);
+		return res.data;
 	},
-	async (error) => {
-		const originalRequest = error.config;
-		const errMessage = error.response.data.errors[0].message as string;
-		if (errMessage.includes("not logged in") && !originalRequest._retry) {
-			originalRequest._retry = true;
-			await authApi.refreshAccessToken();
-			return api(originalRequest);
+	login: async (input: LoginFormInput): Promise<AuthResponse> => {
+		const res = await axiosInstance.post<AuthResponse>("/auth/login", input);
+		return res.data;
+	},
+	verifyEmail: async (input: { token: string }): Promise<AuthResponse> => {
+		const res = await axiosInstance.post<AuthResponse>(
+			"/auth/verify-email",
+			input,
+		);
+		return res.data;
+	},
+	refreshAccessToken: async (): Promise<AuthResponse> => {
+		const res = await axiosInstance.post<AuthResponse>("/auth/refresh");
+		return res.data;
+	},
+	logout: async (): Promise<void> => {
+		await axiosInstance.post("/auth/logout");
+	},
+
+	getMe: async (): Promise<User | null> => {
+		try {
+			const res = await axiosInstance.get<{ user: User }>("/users/me");
+			return res.data.user;
+		} catch (error) {
+			if (axios.isAxiosError(error) && error.response?.status === 401) {
+				return null;
+			}
+			throw error;
 		}
-		return Promise.reject(error);
 	},
-);
+};
+export const authKeys = {
+	me: ["auth", "user"] as const,
+};
+
+export const userQueryOptions = () =>
+	queryOptions({
+		queryKey: authKeys.me,
+		queryFn: () => authApi.getMe(),
+		staleTime: QueryStaleTime,
+		retry: false,
+	});
