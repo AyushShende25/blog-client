@@ -1,86 +1,171 @@
-import { ChevronDown, X } from "lucide-react";
-import { useState } from "react";
+import { XIcon } from "@phosphor-icons/react";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
-interface MultiSelectProps<T> {
-	options: T[];
-	selected: T[];
-	onChange: (selected: T[]) => void;
-	labelSelector: (item: T) => string;
-	valueSelector: (item: T) => string | number;
+type Option = {
+	id: string;
+	name: string;
+};
+
+type MultiSelectProps = {
+	options: Option[];
+	value: Option[]; // selectedOptions
+	onChange: (value: Option[]) => void; // setSelectedOptions
 	placeholder?: string;
-}
+	searchPlaceholder?: string;
+};
 
-function MultiSelect<T>({
+function MultiSelect({
 	options,
-	selected,
+	value,
 	onChange,
-	labelSelector,
-	valueSelector,
 	placeholder = "Select options",
-}: MultiSelectProps<T>) {
+	searchPlaceholder = "Search...",
+}: MultiSelectProps) {
 	const [isOpen, setIsOpen] = useState(false);
+	const [searchTerm, setSearchTerm] = useState("");
 
-	const toggleOption = (item: T) => {
-		const value = valueSelector(item);
-		if (selected.some((s) => valueSelector(s) === value)) {
-			onChange(selected.filter((s) => valueSelector(s) !== value));
+	const dropdownRef = useRef<HTMLDivElement>(null);
+	const searchInputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (isOpen) {
+			searchInputRef.current?.focus();
 		} else {
-			onChange([...selected, item]);
+			setSearchTerm("");
 		}
+	}, [isOpen]);
+
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				dropdownRef.current &&
+				!dropdownRef.current.contains(event.target as Node)
+			) {
+				setIsOpen(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
+
+	const toggleSelected = (option: Option) => {
+		const exists = value.some((item) => item.id === option.id);
+
+		if (exists) {
+			onChange(value.filter((item) => item.id !== option.id));
+			return;
+		}
+
+		onChange([...value, option]);
 	};
 
-	const removeOption = (
-		item: T,
-		e: React.MouseEvent<SVGSVGElement, MouseEvent>,
-	) => {
-		e.stopPropagation(); // Prevent dropdown from toggling
-		onChange(selected.filter((s) => valueSelector(s) !== valueSelector(item)));
+	const removeSelected = (id: string) => {
+		onChange(value.filter((item) => item.id !== id));
 	};
+
+	const filteredOptions = options.filter((option) =>
+		option.name.toLowerCase().includes(searchTerm.toLowerCase()),
+	);
 
 	return (
-		<div className="relative min-w-44">
+		<div ref={dropdownRef} className="relative w-full">
 			<div
+				role="button"
+				tabIndex={0}
 				onClick={() => setIsOpen((prev) => !prev)}
-				className="px-3 py-2 rounded cursor-pointer border bg-white dark:bg-background"
+				className="flex min-h-11 w-full cursor-pointer flex-wrap items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-colors focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50"
 			>
-				{selected.length > 0 ? (
-					<div className="flex flex-wrap gap-1">
-						{selected.map((item) => (
-							<span
-								key={valueSelector(item)}
-								className="px-2 py-1 bg-muted rounded-md flex items-center text-sm"
-							>
-								{labelSelector(item)}
-								<X
-									size={12}
-									className="ml-1 cursor-pointer"
-									onClick={(e) => removeOption(item, e)}
-								/>
-							</span>
-						))}
-					</div>
-				) : (
-					<div className="flex justify-between items-center gap-4 text-sm">
-						<span>{placeholder}</span>
-						<ChevronDown size={20} />
-					</div>
+				{value.length === 0 && (
+					<span className="text-muted-foreground">{placeholder}</span>
+				)}
+
+				{value.map((option) => (
+					<span
+						key={option.id}
+						className="inline-flex items-center gap-1 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground"
+					>
+						{option.name}
+
+						<button
+							type="button"
+							onClick={(event) => {
+								event.stopPropagation();
+								removeSelected(option.id);
+							}}
+							className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
+							aria-label={`Remove ${option.name}`}
+						>
+							<XIcon size={14} weight="bold" />
+						</button>
+					</span>
+				))}
+
+				{value.length > 0 && (
+					<Button
+						type="button"
+						variant="ghost"
+						size="sm"
+						onClick={(event) => {
+							event.stopPropagation();
+							onChange([]);
+						}}
+						className="ml-auto text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+					>
+						Clear
+					</Button>
 				)}
 			</div>
 
 			{isOpen && (
-				<ul className="absolute bg-card shadow border mt-1 rounded-md p-1 w-full z-20">
-					{options.map((item) => (
-						<li
-							key={valueSelector(item)}
-							className="hover:bg-muted px-3 py-1 rounded cursor-pointer"
-							onClick={() => toggleOption(item)}
-						>
-							{labelSelector(item)}
-						</li>
-					))}
-				</ul>
+				<div className="absolute z-50 mt-2 w-full rounded-md border border-border bg-popover text-popover-foreground shadow-md">
+					<div className="border-b border-border p-2">
+						<Input
+							ref={searchInputRef}
+							value={searchTerm}
+							onChange={(event) => setSearchTerm(event.target.value)}
+							onClick={(event) => event.stopPropagation()}
+							placeholder={searchPlaceholder}
+							className="h-9"
+						/>
+					</div>
+
+					<ul className="max-h-60 overflow-y-auto p-1">
+						{filteredOptions.length === 0 && (
+							<li className="px-3 py-6 text-center text-sm text-muted-foreground">
+								No options found.
+							</li>
+						)}
+
+						{filteredOptions.map((option) => {
+							const isSelected = value.some((item) => item.id === option.id);
+
+							return (
+								<li
+									key={option.id}
+									onClick={() => toggleSelected(option)}
+									className="flex cursor-pointer items-center rounded-sm px-3 py-2 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
+								>
+									<span className="flex-1">{option.name}</span>
+
+									{isSelected && (
+										<span className="text-xs font-medium text-primary">
+											Selected
+										</span>
+									)}
+								</li>
+							);
+						})}
+					</ul>
+				</div>
 			)}
 		</div>
 	);
 }
+
 export default MultiSelect;

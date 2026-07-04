@@ -15,26 +15,28 @@ export type UpdateCategoryInput = {
 };
 
 export const categoriesApi = {
-	fetchAllCategories: async (): Promise<Category[]> => {
+	fetchAllCategories: async (): Promise<CategoryListResponse> => {
 		const res = await axiosInstance.get<CategoryListResponse>("/categories");
-		return res.data.categories;
+		return res.data;
 	},
-	createCategory: async (input: CreateCategoryInput): Promise<Category> => {
+	createCategory: async (
+		input: CreateCategoryInput,
+	): Promise<CategoryResponse> => {
 		const res = await axiosInstance.post<CategoryResponse>(
 			"/categories",
 			input,
 		);
-		return res.data.category;
+		return res.data;
 	},
 	updateCategory: async (
 		id: string,
 		input: UpdateCategoryInput,
-	): Promise<Category> => {
+	): Promise<CategoryResponse> => {
 		const res = await axiosInstance.patch<CategoryResponse>(
 			`/categories/${id}`,
 			input,
 		);
-		return res.data.category;
+		return res.data;
 	},
 	deleteCategory: async (id: string): Promise<void> => {
 		await axiosInstance.delete(`/categories/${id}`);

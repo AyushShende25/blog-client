@@ -1,15 +1,13 @@
-import type { FieldApi } from "@tanstack/react-form";
+import type { AnyFieldApi } from "@tanstack/react-form";
+import { FieldError } from "./ui/field";
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-function FieldInfo({ field }: { field: FieldApi<any, any, any, any> }) {
+export function FieldInfo({ field }: { field: AnyFieldApi }) {
 	return (
 		<>
-			{field.state.meta.isTouched && field.state.meta.errors.length ? (
-				<p className="text-destructive  text-sm">
-					{field.state.meta.errors.join(", ")}
-				</p>
+			{field.state.meta.isTouched && !field.state.meta.isValid ? (
+				<FieldError errors={field.state.meta.errors} />
 			) : null}
+			{field.state.meta.isValidating ? "Validating..." : null}
 		</>
 	);
 }
-export default FieldInfo;

@@ -35,7 +35,7 @@ type GetUsersFilters = {
 	includeDeleted?: boolean;
 };
 
-type GetUsersResponse = {
+type UserListResponse = {
 	users: User[];
 	meta: {
 		page: number;
@@ -69,63 +69,90 @@ type GetFollowsParams = {
 	limit: number;
 };
 
-type GetFollowersResponse = {
+type FollowersResponse = {
 	followers: { username: string }[];
 };
 
-type GetFollowingResponse = {
+type FollowingResponse = {
 	following: { username: string }[];
 };
 
+type StatsResponse = {
+	posts: number;
+	followers: number;
+	following: number;
+};
+
 export const userApi = {
-	getAll: async (params: GetUsersFilters): Promise<GetUsersResponse> => {
-		const res = await axiosInstance.get<GetUsersResponse>("/users", {
+	getAll: async (params: GetUsersFilters): Promise<UserListResponse> => {
+		const res = await axiosInstance.get<UserListResponse>("/users", {
 			params,
 		});
 		return res.data;
 	},
-	followers: async (userId: string, params: GetFollowsParams) => {
-		const res = await axiosInstance.get<GetFollowersResponse>(
+	followers: async (
+		userId: string,
+		params: GetFollowsParams,
+	): Promise<FollowersResponse> => {
+		const res = await axiosInstance.get<FollowersResponse>(
 			`/users/${userId}/followers`,
 			{ params },
 		);
-		return res.data.followers;
+		return res.data;
 	},
-	following: async (userId: string, params: GetFollowsParams) => {
-		const res = await axiosInstance.get<GetFollowingResponse>(
+	following: async (
+		userId: string,
+		params: GetFollowsParams,
+	): Promise<FollowingResponse> => {
+		const res = await axiosInstance.get<FollowingResponse>(
 			`/users/${userId}/following`,
 			{ params },
 		);
-		return res.data.following;
+		return res.data;
 	},
-	updateMe: async (input: UpdateMeInput): Promise<User> => {
+	updateMe: async (input: UpdateMeInput): Promise<UserResponse> => {
 		const res = await axiosInstance.patch<UserResponse>("/users/me", input);
-		return res.data.user;
+		return res.data;
 	},
 	deleteMe: async (): Promise<void> => {
 		await axiosInstance.delete("/users/me");
 	},
-	update: async (userId: string, input: UpdateUserInput): Promise<User> => {
+	update: async (
+		userId: string,
+		input: UpdateUserInput,
+	): Promise<UserResponse> => {
 		const res = await axiosInstance.patch<UserResponse>(
 			`/users/${userId}`,
 			input,
 		);
-		return res.data.user;
+		return res.data;
 	},
 	delete: async (userId: string): Promise<void> => {
 		await axiosInstance.delete(`/users/${userId}`);
 	},
-	follow: async (userId: string): Promise<string> => {
+	follow: async (userId: string): Promise<MsgResponse> => {
 		const res = await axiosInstance.post<MsgResponse>(
 			`/users/${userId}/follow`,
 		);
-		return res.data.message;
+		return res.data;
 	},
-	unfollow: async (userId: string): Promise<string> => {
+	unfollow: async (userId: string): Promise<MsgResponse> => {
 		const res = await axiosInstance.delete<MsgResponse>(
 			`/users/${userId}/follow`,
 		);
-		return res.data.message;
+		return res.data;
+	},
+	checkFollowing: async (userId: string): Promise<{ isFollowing: boolean }> => {
+		const res = await axiosInstance.get<{ isFollowing: boolean }>(
+			`/users/${userId}/is-following`,
+		);
+		return res.data;
+	},
+	stats: async (userId: string): Promise<StatsResponse> => {
+		const res = await axiosInstance.get<StatsResponse>(
+			`/users/${userId}/stats`,
+		);
+		return res.data;
 	},
 };
 
@@ -137,6 +164,9 @@ export const userKeys = {
 		[...userKeys.user(userId), "followers", params] as const,
 	following: (userId: string, params: GetFollowsParams) =>
 		[...userKeys.user(userId), "following", params] as const,
+	isFollowing: (userId: string) =>
+		[...userKeys.user(userId), "isFollowing"] as const,
+	stats: (userId: string) => [...userKeys.user(userId), "stats"] as const,
 };
 
 export const fetchUsersQueryOptions = (params: GetUsersFilters) =>
@@ -169,6 +199,20 @@ export const fetchFollowingQueryOptions = ({
 	queryOptions({
 		queryKey: userKeys.following(userId, params),
 		queryFn: () => userApi.following(userId, params),
+		staleTime: QueryStaleTime,
+	});
+
+export const fetchIsFollowingQueryOptions = ({ userId }: { userId: string }) =>
+	queryOptions({
+		queryKey: userKeys.isFollowing(userId),
+		queryFn: () => userApi.checkFollowing(userId),
+		staleTime: QueryStaleTime,
+	});
+
+export const fetchUserStatsQueryOptions = ({ userId }: { userId: string }) =>
+	queryOptions({
+		queryKey: userKeys.stats(userId),
+		queryFn: () => userApi.stats(userId),
 		staleTime: QueryStaleTime,
 	});
 

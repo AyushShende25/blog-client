@@ -2,12 +2,21 @@ import { axiosInstance } from "@/api/axiosInstance";
 import { QueryStaleTime } from "@/constants";
 import type { LoginFormInput, SignupFormInput } from "@/constants/schema";
 import type { User } from "@/constants/types";
-
-import { queryOptions } from "@tanstack/react-query";
+import { handleApiError } from "@/lib/utils";
+import {
+	queryOptions,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
 import axios from "axios";
+import { toast } from "sonner";
 
 type AuthResponse = {
 	message: string;
+};
+
+type UserResponse = {
+	user: User;
 };
 
 export const authApi = {
@@ -34,10 +43,10 @@ export const authApi = {
 		await axiosInstance.post("/auth/logout");
 	},
 
-	getMe: async (): Promise<User | null> => {
+	getMe: async (): Promise<UserResponse | null> => {
 		try {
-			const res = await axiosInstance.get<{ user: User }>("/users/me");
-			return res.data.user;
+			const res = await axiosInstance.get<UserResponse>("/users/me");
+			return res.data;
 		} catch (error) {
 			if (axios.isAxiosError(error) && error.response?.status === 401) {
 				return null;
@@ -46,6 +55,7 @@ export const authApi = {
 		}
 	},
 };
+
 export const authKeys = {
 	me: ["auth", "user"] as const,
 };
@@ -57,3 +67,46 @@ export const userQueryOptions = () =>
 		staleTime: QueryStaleTime,
 		retry: false,
 	});
+
+export function useLogout() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: authApi.logout,
+		onSettled: () => {
+			queryClient.clear();
+		},
+	});
+}
+
+export function useLogin() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: authApi.login,
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: authKeys.me });
+		},
+	});
+}
+
+export function useSignup() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: authApi.signup,
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: authKeys.me });
+			toast.success("User registered successfully. Please verify you email.");
+		},
+	});
+}
+
+export function useVerifyEmail() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: authApi.verifyEmail,
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: authKeys.me });
+			toast.success("User verified successfully.");
+		},
+		onError: handleApiError,
+	});
+}

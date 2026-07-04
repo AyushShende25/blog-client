@@ -10,18 +10,18 @@ import { QueryStaleTime } from "@/constants";
 import { toast } from "sonner";
 import { handleApiError } from "@/lib/utils";
 
+type FetchPostsFilters = {
+	category?: string;
+	tag?: string;
+	search?: string;
+	sort?: string;
+	limit?: number;
+};
+
 type FetchPostsParams = FetchPostsFilters & {
 	page: number;
 	dateFrom?: Date;
 	dateTo?: Date;
-};
-
-type FetchPostsFilters = {
-	category?: string[];
-	tag?: string[];
-	search?: string;
-	sort?: string;
-	limit?: number;
 };
 
 type CreatePostInput = {
@@ -44,7 +44,7 @@ type UpdatePostInput = {
 	coverImage?: string;
 };
 
-type FetchPostsResponse = {
+type PostListResponse = {
 	posts: Post[];
 	meta: {
 		totalPages: number;
@@ -60,12 +60,11 @@ type PostResponse = {
 	post: Post;
 };
 
-type CreatePostResponse = {
-	post: Post;
+type CreatePostResponse = PostResponse & {
 	message: string;
 };
 
-type FetchBookmarksResponse = {
+type BookmarkListResponse = {
 	posts: Post[];
 };
 
@@ -74,9 +73,17 @@ type BookmarkPostResponse = {
 	postId: string;
 };
 
+type UserPostStatsResponse = {
+	count: {
+		posts: number;
+		likes: number;
+		comments: number;
+	};
+};
+
 export const postsApi = {
-	fetchPosts: async (params: FetchPostsParams): Promise<FetchPostsResponse> => {
-		const res = await axiosInstance.get<FetchPostsResponse>("/posts", {
+	fetchPosts: async (params: FetchPostsParams): Promise<PostListResponse> => {
+		const res = await axiosInstance.get<PostListResponse>("/posts/", {
 			params: {
 				...params,
 				dateFrom: params.dateFrom?.toISOString(),
@@ -89,8 +96,8 @@ export const postsApi = {
 		const res = await axiosInstance.get<PostResponse>(`/posts/slug/${slug}`);
 		return res.data;
 	},
-	fetchUserPosts: async (username: string): Promise<FetchPostsResponse> => {
-		const res = await axiosInstance.get<FetchPostsResponse>(
+	fetchUserPosts: async (username: string): Promise<PostListResponse> => {
+		const res = await axiosInstance.get<PostListResponse>(
 			`/posts/author/${username}`,
 		);
 		return res.data;
@@ -101,8 +108,8 @@ export const postsApi = {
 	},
 	fetchMyPosts: async (
 		params: FetchPostsParams & { status?: PostStatus },
-	): Promise<FetchPostsResponse> => {
-		const res = await axiosInstance.get<FetchPostsResponse>(`/posts/me`, {
+	): Promise<PostListResponse> => {
+		const res = await axiosInstance.get<PostListResponse>(`/posts/me`, {
 			params: {
 				...params,
 				dateFrom: params.dateFrom?.toISOString(),
@@ -111,9 +118,9 @@ export const postsApi = {
 		});
 		return res.data;
 	},
-	fetchBookmarks: async (): Promise<FetchBookmarksResponse> => {
+	fetchBookmarks: async (): Promise<BookmarkListResponse> => {
 		const res =
-			await axiosInstance.get<FetchBookmarksResponse>(`/posts/me/bookmarks`);
+			await axiosInstance.get<BookmarkListResponse>(`/posts/me/bookmarks`);
 		return res.data;
 	},
 	bookmarkPost: async (postId: string): Promise<BookmarkPostResponse> => {
@@ -145,6 +152,11 @@ export const postsApi = {
 		);
 		return res.data;
 	},
+	userStats: async () => {
+		const res =
+			await axiosInstance.get<UserPostStatsResponse>("/posts/me/stats");
+		return res.data;
+	},
 };
 
 export const postKeys = {
@@ -157,6 +169,7 @@ export const postKeys = {
 	bookmarks: () => [...postKeys.all, "bookmarks"] as const,
 	post: (slug: string) => ["post", slug] as const,
 	postById: (id: string) => ["post", id] as const,
+	userStats: (username: string) => ["stats", username] as const,
 };
 
 export const fetchPostsQueryOptions = ({
@@ -236,6 +249,13 @@ export const fetchBookmarksQueryOptions = () =>
 	queryOptions({
 		queryKey: postKeys.bookmarks(),
 		queryFn: () => postsApi.fetchBookmarks(),
+		staleTime: QueryStaleTime,
+	});
+
+export const fetchUserPostStatsQueryOptions = (username: string) =>
+	queryOptions({
+		queryKey: postKeys.userStats(username),
+		queryFn: () => postsApi.userStats(),
 		staleTime: QueryStaleTime,
 	});
 

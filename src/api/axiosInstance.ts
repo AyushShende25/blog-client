@@ -1,5 +1,11 @@
 import axios, { type AxiosRequestConfig } from "axios";
 
+declare module "axios" {
+	interface AxiosRequestConfig {
+		_retry?: boolean;
+	}
+}
+
 export const axiosInstance = axios.create({
 	baseURL: import.meta.env.VITE_PUBLIC_BACKEND_URL,
 	withCredentials: true,
@@ -10,20 +16,25 @@ let isRefreshing = false;
 
 // Collect reuqests that failed during refreshing the token
 let failedQueue: {
-	resolve: (value?: unknown) => void;
+	resolve: (value?: any) => void;
 	reject: (error?: unknown) => void;
-	config: AxiosRequestConfig & { _retry?: boolean };
+	config: AxiosRequestConfig;
 }[] = [];
 
-const processQueue = (error: unknown = null) => {
-	failedQueue.forEach(({ resolve, reject, config }) => {
+const processQueue = async (error: unknown = null) => {
+	for (const { resolve, reject, config } of failedQueue) {
 		if (error) {
 			reject(error);
 		} else {
-			config._retry = true;
-			resolve(axiosInstance(config));
+			try {
+				config._retry = true;
+				const response = await axiosInstance(config);
+				resolve(response);
+			} catch (err) {
+				reject(err);
+			}
 		}
-	});
+	}
 
 	failedQueue = [];
 };
@@ -31,26 +42,36 @@ const processQueue = (error: unknown = null) => {
 axiosInstance.interceptors.response.use(
 	(response) => response,
 	async (error) => {
-		const originalRequest = error.config;
-
-		if (error.response?.status !== 401 || originalRequest._retry) {
+		const originalRequest = error.config as AxiosRequestConfig;
+		console.log(originalRequest.url);
+		console.log({
+  status: error.response?.status,
+  url: originalRequest.url,
+  _retry: originalRequest._retry,
+});
+		if (
+			error.response?.status !== 401 ||
+			originalRequest._retry ||
+			originalRequest.url?.startsWith("/auth")
+		) {
 			return Promise.reject(error);
 		}
-		originalRequest._retry = true;
 
 		if (isRefreshing) {
 			return new Promise((resolve, reject) => {
 				failedQueue.push({ resolve, reject, config: originalRequest });
 			});
 		}
+
+		originalRequest._retry = true;
 		isRefreshing = true;
 
 		try {
-			await axiosInstance.post("/auth/refresh");
-			processQueue();
+			const refreshResponse = await axiosInstance.post("/auth/refresh"); console.log("Refresh succeeded:", refreshResponse.status);
+			await processQueue();
 			return axiosInstance(originalRequest);
 		} catch (refreshError) {
-			processQueue(refreshError);
+			await processQueue(refreshError);
 			return Promise.reject(refreshError);
 		} finally {
 			isRefreshing = false;

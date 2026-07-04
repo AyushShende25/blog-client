@@ -1,30 +1,33 @@
-import type {
-	createPostSchema,
-	loginSchema,
-	signupSchema,
-	verifyEmailSchema,
-} from "@/constants/schema";
-// biome-ignore lint/style/useImportType: <explanation>
-import { z } from "zod";
+import type { Icon } from "@phosphor-icons/react";
 
-export interface ApiErrorResponse {
-	success: false;
-	message: string;
-	errors?: { message: string; field?: string }[];
-}
 export type Post = {
-	author: { username: string };
-	authorId: string;
-	categories: { id: string; name: string }[];
-	content: string;
-	createdAt: string;
 	id: string;
-	images: string[];
 	slug: string;
-	status: POST_STATUS;
 	title: string;
+	content: string;
+	excerpt: string;
+	metaTitle: string;
+	metaDescription: string;
+	ogImage: string | null;
+	authorId: string;
+	status: PostStatus;
+	coverImage: string | null;
+	publishedAt: string | null;
+	createdAt: string;
 	updatedAt: string;
-	coverImage: string;
+	deletedAt: string | null;
+	categories: Category[];
+	tags: Tag[];
+	media: { id: string; url: string; type: MediaType }[];
+	author: {
+		username: string;
+		avatar: string | null;
+		bio: string | null;
+	} | null;
+	_count: {
+		likes: number;
+		comments: number;
+	};
 };
 
 export type Category = {
@@ -32,37 +35,100 @@ export type Category = {
 	name: string;
 };
 
-export type LoginInput = z.infer<typeof loginSchema>;
+export type Tag = {
+	id: string;
+	name: string;
+};
 
-export type SignupInput = z.infer<typeof signupSchema>;
+export const MEDIA_TYPE = {
+	IMAGE: "IMAGE",
+	VIDEO: "VIDEO",
+} as const;
 
-export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+export type MediaType = (typeof MEDIA_TYPE)[keyof typeof MEDIA_TYPE];
 
-export type CreatePostInput = z.infer<typeof createPostSchema>;
+export const MEDIA_USAGE = {
+	AVATAR: "AVATAR",
+	POST: "POST",
+} as const;
 
-export const POST_STATUSES = {
+export type MediaUsage = (typeof MEDIA_USAGE)[keyof typeof MEDIA_USAGE];
+
+export const POST_STATUS = {
 	PUBLISHED: "PUBLISHED",
 	DRAFT: "DRAFT",
 } as const;
 
-export type POST_STATUS = (typeof POST_STATUSES)[keyof typeof POST_STATUSES];
+export type PostStatus = (typeof POST_STATUS)[keyof typeof POST_STATUS];
 
 export const ROLES = {
 	USER: "USER",
 	ADMIN: "ADMIN",
 } as const;
 
-export type ROLE = (typeof ROLES)[keyof typeof ROLES];
+export type Role = (typeof ROLES)[keyof typeof ROLES];
+
+export const USER_STATUS = {
+	ACTIVE: "ACTIVE",
+	SUSPENDED: "SUSPENDED",
+	DELETED: "DELETED",
+} as const;
+
+export type UserStatus = (typeof USER_STATUS)[keyof typeof USER_STATUS];
+
+export type User = {
+	id: string;
+	email: string;
+	username: string;
+	avatar: string | null;
+	bio: string | null;
+	socialLinks: {
+		platform: Platform;
+		link: string;
+	}[];
+	role: Role;
+	_count: {
+		posts: number;
+		followers: number;
+		following: number;
+	};
+	createdAt: Date;
+};
+
+export type FormatOption = {
+	label: string;
+	icon: Icon;
+	isActive?: boolean;
+	isDisabled?: boolean;
+	onClick: () => void;
+};
+
+export type Media = {
+	id: string;
+	url: string;
+	type: MediaType;
+	mimeType: string;
+	size: number;
+	postId: string | null;
+	uploaderId: string | null;
+	createdAt: Date;
+};
+
+export type Platform = "github" | "twitter" | "linkedin";
 
 export type SavedPost = Omit<Post, "author" | "categories">;
 
-export type User = {
-	createdAt: string;
-	email: string;
+export type Comment = {
 	id: string;
-	isVerified: boolean;
-	role: ROLE;
-	updatedAt: string;
+	content: string;
+	authorId: string | null;
+	postId: string;
+	isDeleted: boolean;
+	parentId: string | null;
+	createdAt: Date;
+	updatedAt: Date;
+
 	username: string;
-	avatarUrl: string | null;
+	avatar: string | undefined;
+	replies: Comment[];
 };

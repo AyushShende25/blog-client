@@ -1,6 +1,4 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import type { LucideProps } from "lucide-react";
-
 import {
 	Sidebar,
 	SidebarContent,
@@ -10,17 +8,16 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import type { Icon } from "@phosphor-icons/react";
 
 type NavigationItem = {
-	title: string;
-	url: string;
-	icon: React.ForwardRefExoticComponent<
-		Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
-	>;
+	readonly title: string;
+	readonly to: string;
+	readonly icon: Icon;
 };
 
 type DashboardSidebarProps = {
-	navigationItems: NavigationItem[];
+	navigationItems: readonly NavigationItem[];
 };
 
 function DashboardSidebar({ navigationItems }: DashboardSidebarProps) {
@@ -36,8 +33,8 @@ function DashboardSidebar({ navigationItems }: DashboardSidebarProps) {
 						<SidebarMenu>
 							{navigationItems.map((item) => (
 								<SidebarMenuItem key={item.title}>
-									<SidebarMenuButton asChild isActive={pathname === item.url}>
-										<Link to={item.url}>
+									<SidebarMenuButton asChild isActive={pathname === item.to}>
+										<Link to={item.to}>
 											<item.icon />
 											<span>{item.title}</span>
 										</Link>

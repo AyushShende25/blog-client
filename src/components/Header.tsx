@@ -1,9 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Search, X } from "lucide-react";
-import { useEffect, useState } from "react";
-
-import { userQueryOptions } from "@/api/userApi";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Logo from "@/components/Logo";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,83 +13,32 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import useLogout from "@/hooks/useLogout";
+import { useLogout, userQueryOptions } from "@/api/authApi";
+import { MagnifyingGlassIcon, XCircleIcon } from "@phosphor-icons/react";
+import type { User } from "@/constants/types";
 
 function Header() {
 	const [isSearchBannerOpen, setIsSearchBannerOpen] = useState(false);
 
-	useEffect(() => {
-		const handleEsc = (e: KeyboardEvent) => {
-			if (e.key === "Escape") {
-				setIsSearchBannerOpen(false);
-			}
-		};
-
-		if (isSearchBannerOpen) {
-			window.addEventListener("keydown", handleEsc);
-		}
-
-		return () => window.removeEventListener("keydown", handleEsc);
-	}, [isSearchBannerOpen]);
-
-	const { data: user } = useQuery(userQueryOptions());
-
-	const navigate = useNavigate();
-
-	const { logoutMutation } = useLogout();
-
-	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		const searchQuery = e.currentTarget.value;
-		if (e.key === "Enter") {
-			navigate({
-				to: "/search",
-				search: (prev) => ({
-					...prev,
-					filter: searchQuery,
-				}),
-			});
-			setIsSearchBannerOpen(false);
-		}
-	};
+	const { data, isPending } = useQuery(userQueryOptions());
 
 	return (
-		<header className="pd-x py-6 relative">
-			{/* Search Banner */}
+		<header className="container px-4 sm:px-10 lg:px-14 py-6 relative">
 			{isSearchBannerOpen && (
-				<>
-					{/* Overlay */}
-					<div
-						className="fixed inset-0 bg-foreground/35 z-10 animate-in fade-in duration-200"
-						onClick={() => setIsSearchBannerOpen(false)}
-					/>
-
-					<div className="w-full pd-x py-8 bg-background fixed top-0 left-0 z-20 flex items-center animate-in slide-in-from-top duration-300">
-						<Input
-							placeholder="Search"
-							className="outline-none border-none focus-visible:ring-0 placeholder:font-bold md:text-3xl text-2xl w-full pr-12"
-							autoFocus
-							onKeyDown={handleKeyPress}
-						/>
-						<Button
-							onClick={() => setIsSearchBannerOpen(false)}
-							size={"icon"}
-							className="absolute right-10"
-						>
-							<X size={24} />
-						</Button>
-					</div>
-				</>
+				<SearchBanner
+					isSearchBannerOpen={isSearchBannerOpen}
+					onSearchBannerChange={setIsSearchBannerOpen}
+				/>
 			)}
 
-			{/* NavBar */}
 			<div className="flex items-center justify-between">
 				<Link to="/">
 					<Logo />
 				</Link>
-				<nav className="flex items-center gap-4">
-					<div className="hidden md:block relative ">
-						<Search
-							size="20px"
+				<nav className="flex items-center gap-2 md:gap-6">
+					<div className="hidden md:block relative">
+						<MagnifyingGlassIcon
+							size={20}
 							className="absolute top-2 left-2 cursor-pointer"
 							onClick={() => setIsSearchBannerOpen(true)}
 						/>
@@ -103,44 +49,16 @@ function Header() {
 						/>
 					</div>
 					<Button
-						size="icon"
+						size="icon-sm"
 						className="md:hidden"
 						variant="outline"
 						onClick={() => setIsSearchBannerOpen(true)}
 					>
-						<Search />
+						<MagnifyingGlassIcon size={20} />
 					</Button>
 					<ModeToggle />
-					{user ? (
-						<>
-							<DropdownMenu>
-								<DropdownMenuTrigger className="rounded-full">
-									<Avatar>
-										<AvatarImage
-											src={user?.avatarUrl ?? "/default-avatar.png"}
-										/>
-										<AvatarFallback>{user?.username}</AvatarFallback>
-									</Avatar>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent>
-									<Link to="/new-post">
-										<DropdownMenuItem>New Post</DropdownMenuItem>
-									</Link>
-									<Link to="/dashboard">
-										<DropdownMenuItem>Dashboard</DropdownMenuItem>
-									</Link>
-									{user.role === "ADMIN" ? (
-										<Link to="/admin">
-											<DropdownMenuItem>Admin Dashboard</DropdownMenuItem>
-										</Link>
-									) : null}
-									<DropdownMenuSeparator />
-									<DropdownMenuItem onClick={() => logoutMutation()}>
-										Logout
-									</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
-						</>
+					{isPending ? null : data ? (
+						<Menu user={data.user} />
 					) : (
 						<Button asChild>
 							<Link to="/login">Login</Link>
@@ -152,3 +70,110 @@ function Header() {
 	);
 }
 export default Header;
+
+function Menu({ user }: { user: User }) {
+	const logoutMutation = useLogout();
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger className="rounded-full">
+				<Avatar>
+					<AvatarImage src={user?.avatar ?? "/default-avatar.png"} />
+					<AvatarFallback>{user?.username}</AvatarFallback>
+				</Avatar>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent>
+				<Link to="/posts/new">
+					<DropdownMenuItem>New Post</DropdownMenuItem>
+				</Link>
+				<Link to="/dashboard">
+					<DropdownMenuItem>Dashboard</DropdownMenuItem>
+				</Link>
+				{user.role === "ADMIN" ? (
+					<Link to="/admin">
+						<DropdownMenuItem>Admin Dashboard</DropdownMenuItem>
+					</Link>
+				) : null}
+				<DropdownMenuSeparator />
+				<DropdownMenuItem onClick={() => logoutMutation.mutate()}>
+					Logout
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+}
+
+function SearchBanner({
+	isSearchBannerOpen,
+	onSearchBannerChange,
+}: {
+	isSearchBannerOpen: boolean;
+	onSearchBannerChange: Dispatch<SetStateAction<boolean>>;
+}) {
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		const handleEsc = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				onSearchBannerChange(false);
+			}
+		};
+
+		if (isSearchBannerOpen) {
+			window.addEventListener("keydown", handleEsc);
+		}
+
+		return () => window.removeEventListener("keydown", handleEsc);
+	}, [isSearchBannerOpen]);
+
+	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		const searchQuery = e.currentTarget.value;
+		if (e.key === "Enter") {
+			navigate({
+				to: "/posts/search",
+				search: (prev) => ({
+					...prev,
+					search: searchQuery,
+				}),
+			});
+			onSearchBannerChange(false);
+		}
+	};
+	return (
+		<>
+			<div
+				className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+				onClick={() => onSearchBannerChange(false)}
+			/>
+			<div
+				className="fixed top-0 left-0 right-0 z-50
+                   bg-background/95 backdrop-blur-md
+                   shadow-lg border-b
+                   animate-in slide-in-from-top duration-300 container"
+			>
+				<div className="px-2 sm:px-10 py-8 relative flex items-center">
+					<Input
+						placeholder="Search for posts..."
+						className="w-full 
+                       border-none 
+                       focus-visible:ring-0 shadow-none
+                       bg-transparent
+                       text-2xl md:text-3xl
+                       font-semibold
+                       placeholder:text-muted-foreground/70 placeholder:text-sm md:placeholder:text-lg"
+						autoFocus
+						onKeyDown={handleKeyPress}
+					/>
+
+					<Button
+						onClick={() => onSearchBannerChange(false)}
+						variant="link"
+						className="absolute right-1 cursor-pointer"
+					>
+						<XCircleIcon className="w-full h-full size-4" />
+					</Button>
+				</div>
+			</div>
+		</>
+	);
+}

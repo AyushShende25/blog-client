@@ -1,54 +1,75 @@
 import {
-	BarChart3,
-	BookOpen,
-	Edit3,
-	FileText,
-	Tags,
-	User,
-	Users,
-} from "lucide-react";
+	FileTextIcon,
+	PencilSimpleIcon,
+	UserIcon,
+	ChartBarIcon,
+	UsersIcon,
+	TagIcon,
+	BookmarksIcon,
+	LinkedinLogoIcon,
+	XLogoIcon,
+	GithubLogoIcon,
+	Icon,
+	HashIcon,
+} from "@phosphor-icons/react";
+import { linkOptions } from "@tanstack/react-router";
+import type { Platform } from "./types";
 
-export const DashboardNavItems = [
+export const DashboardNavItems = linkOptions([
 	{
 		title: "Published",
-		url: "/dashboard/published",
-		icon: FileText,
+		to: "/dashboard/published",
+		icon: FileTextIcon,
 	},
 	{
 		title: "Drafts",
-		url: "/dashboard/draft",
-		icon: Edit3,
+		to: "/dashboard/draft",
+		icon: PencilSimpleIcon,
 	},
 	{
 		title: "Profile",
-		url: "/dashboard/profile",
-		icon: User,
+		to: "/dashboard/profile",
+		icon: UserIcon,
 	},
 	{
-		title: "Library",
-		url: "/dashboard/library",
-		icon: BookOpen,
+		title: "Bookmarks",
+		to: "/dashboard/bookmarks",
+		icon: BookmarksIcon,
 	},
-];
-export const AdminNavItems = [
+]);
+
+export const AdminNavItems = linkOptions([
 	{
 		title: "Analytics",
-		url: "/admin/analytics",
-		icon: BarChart3,
+		to: "/admin/analytics",
+		icon: ChartBarIcon,
 	},
 	{
 		title: "Posts",
-		url: "/admin/posts",
-		icon: FileText,
+		to: "/admin/posts",
+		icon: FileTextIcon,
 	},
 	{
 		title: "Users",
-		url: "/admin/users",
-		icon: Users,
+		to: "/admin/users",
+		icon: UsersIcon,
 	},
 	{
 		title: "Categories",
-		url: "/admin/categories",
-		icon: Tags,
+		to: "/admin/categories",
+		icon: TagIcon,
 	},
-];
+	{
+		title: "Tags",
+		to: "/admin/tags",
+		icon: HashIcon,
+	},
+]);
+
+export const socialLinksMap: Record<Platform, Icon> = {
+	linkedin: LinkedinLogoIcon,
+	twitter: XLogoIcon,
+	github: GithubLogoIcon,
+};
+
+export const QueryStaleTime = 5 * 60 * 1000;

@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/jetbrains-mono";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -126,5 +127,19 @@
 	}
 	html {
 		@apply font-mono;
+	}
+}
+@utility container {
+	@apply max-w-360 mx-auto;
+}
+.tiptap img[data-uploading] {
+	opacity: 0.4;
+	filter: grayscale(1);
+	cursor: wait;
+}
+
+@layer components {
+	.prose img {
+		@apply w-full sm:max-w-[80%] md:max-w-[60%] lg:max-w-[30%] max-h-125 my-6 mx-auto object-cover;
 	}
 }

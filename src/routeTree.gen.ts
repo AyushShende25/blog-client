@@ -8,643 +8,518 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as DashboardRouteRouteImport } from './routes/dashboard/route'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as SiteRouteRouteImport } from './routes/_site/route'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as SiteIndexRouteImport } from './routes/_site/index'
+import { Route as DashboardPublishedRouteImport } from './routes/dashboard/published'
+import { Route as DashboardProfileRouteImport } from './routes/dashboard/profile'
+import { Route as DashboardDraftRouteImport } from './routes/dashboard/draft'
+import { Route as DashboardBookmarksRouteImport } from './routes/dashboard/bookmarks'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminTagsRouteImport } from './routes/admin/tags'
+import { Route as AdminPostsRouteImport } from './routes/admin/posts'
+import { Route as AdminCategoriesRouteImport } from './routes/admin/categories'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
+import { Route as AuthVerifyEmailRouteImport } from './routes/_auth/verify-email'
+import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
+import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as SitePostsSearchRouteImport } from './routes/_site/posts/search'
+import { Route as SitePostsNewRouteImport } from './routes/_site/posts/new'
+import { Route as SitePostsSlugRouteImport } from './routes/_site/posts/$slug'
+import { Route as SitePostsEditIdRouteImport } from './routes/_site/posts/edit/$id'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as VerifyEmailImport } from './routes/verify-email'
-import { Route as SignupImport } from './routes/signup'
-import { Route as LoginImport } from './routes/login'
-import { Route as LayoutImport } from './routes/_layout'
-import { Route as DashboardImport } from './routes/_dashboard'
-import { Route as AdminImport } from './routes/_admin'
-import { Route as LayoutIndexImport } from './routes/_layout/index'
-import { Route as LayoutSearchImport } from './routes/_layout/search'
-import { Route as LayoutNewPostImport } from './routes/_layout/new-post'
-import { Route as DashboardDashboardIndexImport } from './routes/_dashboard/dashboard/index'
-import { Route as AdminAdminIndexImport } from './routes/_admin/admin/index'
-import { Route as LayoutPostPostSlugImport } from './routes/_layout/post/$postSlug'
-import { Route as LayoutEditPostPostIdImport } from './routes/_layout/edit-post/$postId'
-import { Route as DashboardDashboardPublishedImport } from './routes/_dashboard/dashboard/published'
-import { Route as DashboardDashboardProfileImport } from './routes/_dashboard/dashboard/profile'
-import { Route as DashboardDashboardLibraryImport } from './routes/_dashboard/dashboard/library'
-import { Route as DashboardDashboardDraftImport } from './routes/_dashboard/dashboard/draft'
-import { Route as AdminAdminUsersImport } from './routes/_admin/admin/users'
-import { Route as AdminAdminPostsImport } from './routes/_admin/admin/posts'
-import { Route as AdminAdminCategoriesImport } from './routes/_admin/admin/categories'
-import { Route as AdminAdminAnalyticsImport } from './routes/_admin/admin/analytics'
-
-// Create/Update Routes
-
-const VerifyEmailRoute = VerifyEmailImport.update({
-  id: '/verify-email',
-  path: '/verify-email',
-  getParentRoute: () => rootRoute,
+const DashboardRouteRoute = DashboardRouteRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const SignupRoute = SignupImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRoute,
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const LoginRoute = LoginImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRoute,
+const SiteRouteRoute = SiteRouteRouteImport.update({
+  id: '/_site',
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const LayoutRoute = LayoutImport.update({
-  id: '/_layout',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DashboardRoute = DashboardImport.update({
-  id: '/_dashboard',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const AdminRoute = AdminImport.update({
-  id: '/_admin',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const LayoutIndexRoute = LayoutIndexImport.update({
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => LayoutRoute,
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
-
-const LayoutSearchRoute = LayoutSearchImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => LayoutRoute,
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const LayoutNewPostRoute = LayoutNewPostImport.update({
-  id: '/new-post',
-  path: '/new-post',
-  getParentRoute: () => LayoutRoute,
+const SiteIndexRoute = SiteIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SiteRouteRoute,
 } as any)
-
-const DashboardDashboardIndexRoute = DashboardDashboardIndexImport.update({
-  id: '/dashboard/',
-  path: '/dashboard/',
-  getParentRoute: () => DashboardRoute,
+const DashboardPublishedRoute = DashboardPublishedRouteImport.update({
+  id: '/published',
+  path: '/published',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
-
-const AdminAdminIndexRoute = AdminAdminIndexImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => AdminRoute,
+const DashboardProfileRoute = DashboardProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
-
-const LayoutPostPostSlugRoute = LayoutPostPostSlugImport.update({
-  id: '/post/$postSlug',
-  path: '/post/$postSlug',
-  getParentRoute: () => LayoutRoute,
+const DashboardDraftRoute = DashboardDraftRouteImport.update({
+  id: '/draft',
+  path: '/draft',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
-
-const LayoutEditPostPostIdRoute = LayoutEditPostPostIdImport.update({
-  id: '/edit-post/$postId',
-  path: '/edit-post/$postId',
-  getParentRoute: () => LayoutRoute,
+const DashboardBookmarksRoute = DashboardBookmarksRouteImport.update({
+  id: '/bookmarks',
+  path: '/bookmarks',
+  getParentRoute: () => DashboardRouteRoute,
 } as any)
-
-const DashboardDashboardPublishedRoute =
-  DashboardDashboardPublishedImport.update({
-    id: '/dashboard/published',
-    path: '/dashboard/published',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-
-const DashboardDashboardProfileRoute = DashboardDashboardProfileImport.update({
-  id: '/dashboard/profile',
-  path: '/dashboard/profile',
-  getParentRoute: () => DashboardRoute,
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const DashboardDashboardLibraryRoute = DashboardDashboardLibraryImport.update({
-  id: '/dashboard/library',
-  path: '/dashboard/library',
-  getParentRoute: () => DashboardRoute,
+const AdminTagsRoute = AdminTagsRouteImport.update({
+  id: '/tags',
+  path: '/tags',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const DashboardDashboardDraftRoute = DashboardDashboardDraftImport.update({
-  id: '/dashboard/draft',
-  path: '/dashboard/draft',
-  getParentRoute: () => DashboardRoute,
+const AdminPostsRoute = AdminPostsRouteImport.update({
+  id: '/posts',
+  path: '/posts',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const AdminAdminUsersRoute = AdminAdminUsersImport.update({
-  id: '/admin/users',
-  path: '/admin/users',
-  getParentRoute: () => AdminRoute,
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const AdminAdminPostsRoute = AdminAdminPostsImport.update({
-  id: '/admin/posts',
-  path: '/admin/posts',
-  getParentRoute: () => AdminRoute,
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const AdminAdminCategoriesRoute = AdminAdminCategoriesImport.update({
-  id: '/admin/categories',
-  path: '/admin/categories',
-  getParentRoute: () => AdminRoute,
+const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
+  id: '/_auth/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AdminAdminAnalyticsRoute = AdminAdminAnalyticsImport.update({
-  id: '/admin/analytics',
-  path: '/admin/analytics',
-  getParentRoute: () => AdminRoute,
+const AuthSignupRoute = AuthSignupRouteImport.update({
+  id: '/_auth/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/_admin': {
-      id: '/_admin'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AdminImport
-      parentRoute: typeof rootRoute
-    }
-    '/_dashboard': {
-      id: '/_dashboard'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof DashboardImport
-      parentRoute: typeof rootRoute
-    }
-    '/_layout': {
-      id: '/_layout'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof LayoutImport
-      parentRoute: typeof rootRoute
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
-      parentRoute: typeof rootRoute
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupImport
-      parentRoute: typeof rootRoute
-    }
-    '/verify-email': {
-      id: '/verify-email'
-      path: '/verify-email'
-      fullPath: '/verify-email'
-      preLoaderRoute: typeof VerifyEmailImport
-      parentRoute: typeof rootRoute
-    }
-    '/_layout/new-post': {
-      id: '/_layout/new-post'
-      path: '/new-post'
-      fullPath: '/new-post'
-      preLoaderRoute: typeof LayoutNewPostImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/search': {
-      id: '/_layout/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof LayoutSearchImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/': {
-      id: '/_layout/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof LayoutIndexImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_admin/admin/analytics': {
-      id: '/_admin/admin/analytics'
-      path: '/admin/analytics'
-      fullPath: '/admin/analytics'
-      preLoaderRoute: typeof AdminAdminAnalyticsImport
-      parentRoute: typeof AdminImport
-    }
-    '/_admin/admin/categories': {
-      id: '/_admin/admin/categories'
-      path: '/admin/categories'
-      fullPath: '/admin/categories'
-      preLoaderRoute: typeof AdminAdminCategoriesImport
-      parentRoute: typeof AdminImport
-    }
-    '/_admin/admin/posts': {
-      id: '/_admin/admin/posts'
-      path: '/admin/posts'
-      fullPath: '/admin/posts'
-      preLoaderRoute: typeof AdminAdminPostsImport
-      parentRoute: typeof AdminImport
-    }
-    '/_admin/admin/users': {
-      id: '/_admin/admin/users'
-      path: '/admin/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminAdminUsersImport
-      parentRoute: typeof AdminImport
-    }
-    '/_dashboard/dashboard/draft': {
-      id: '/_dashboard/dashboard/draft'
-      path: '/dashboard/draft'
-      fullPath: '/dashboard/draft'
-      preLoaderRoute: typeof DashboardDashboardDraftImport
-      parentRoute: typeof DashboardImport
-    }
-    '/_dashboard/dashboard/library': {
-      id: '/_dashboard/dashboard/library'
-      path: '/dashboard/library'
-      fullPath: '/dashboard/library'
-      preLoaderRoute: typeof DashboardDashboardLibraryImport
-      parentRoute: typeof DashboardImport
-    }
-    '/_dashboard/dashboard/profile': {
-      id: '/_dashboard/dashboard/profile'
-      path: '/dashboard/profile'
-      fullPath: '/dashboard/profile'
-      preLoaderRoute: typeof DashboardDashboardProfileImport
-      parentRoute: typeof DashboardImport
-    }
-    '/_dashboard/dashboard/published': {
-      id: '/_dashboard/dashboard/published'
-      path: '/dashboard/published'
-      fullPath: '/dashboard/published'
-      preLoaderRoute: typeof DashboardDashboardPublishedImport
-      parentRoute: typeof DashboardImport
-    }
-    '/_layout/edit-post/$postId': {
-      id: '/_layout/edit-post/$postId'
-      path: '/edit-post/$postId'
-      fullPath: '/edit-post/$postId'
-      preLoaderRoute: typeof LayoutEditPostPostIdImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/post/$postSlug': {
-      id: '/_layout/post/$postSlug'
-      path: '/post/$postSlug'
-      fullPath: '/post/$postSlug'
-      preLoaderRoute: typeof LayoutPostPostSlugImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_admin/admin/': {
-      id: '/_admin/admin/'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminAdminIndexImport
-      parentRoute: typeof AdminImport
-    }
-    '/_dashboard/dashboard/': {
-      id: '/_dashboard/dashboard/'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardDashboardIndexImport
-      parentRoute: typeof DashboardImport
-    }
-  }
-}
-
-// Create and export the route tree
-
-interface AdminRouteChildren {
-  AdminAdminAnalyticsRoute: typeof AdminAdminAnalyticsRoute
-  AdminAdminCategoriesRoute: typeof AdminAdminCategoriesRoute
-  AdminAdminPostsRoute: typeof AdminAdminPostsRoute
-  AdminAdminUsersRoute: typeof AdminAdminUsersRoute
-  AdminAdminIndexRoute: typeof AdminAdminIndexRoute
-}
-
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminAdminAnalyticsRoute: AdminAdminAnalyticsRoute,
-  AdminAdminCategoriesRoute: AdminAdminCategoriesRoute,
-  AdminAdminPostsRoute: AdminAdminPostsRoute,
-  AdminAdminUsersRoute: AdminAdminUsersRoute,
-  AdminAdminIndexRoute: AdminAdminIndexRoute,
-}
-
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
-
-interface DashboardRouteChildren {
-  DashboardDashboardDraftRoute: typeof DashboardDashboardDraftRoute
-  DashboardDashboardLibraryRoute: typeof DashboardDashboardLibraryRoute
-  DashboardDashboardProfileRoute: typeof DashboardDashboardProfileRoute
-  DashboardDashboardPublishedRoute: typeof DashboardDashboardPublishedRoute
-  DashboardDashboardIndexRoute: typeof DashboardDashboardIndexRoute
-}
-
-const DashboardRouteChildren: DashboardRouteChildren = {
-  DashboardDashboardDraftRoute: DashboardDashboardDraftRoute,
-  DashboardDashboardLibraryRoute: DashboardDashboardLibraryRoute,
-  DashboardDashboardProfileRoute: DashboardDashboardProfileRoute,
-  DashboardDashboardPublishedRoute: DashboardDashboardPublishedRoute,
-  DashboardDashboardIndexRoute: DashboardDashboardIndexRoute,
-}
-
-const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
-  DashboardRouteChildren,
-)
-
-interface LayoutRouteChildren {
-  LayoutNewPostRoute: typeof LayoutNewPostRoute
-  LayoutSearchRoute: typeof LayoutSearchRoute
-  LayoutIndexRoute: typeof LayoutIndexRoute
-  LayoutEditPostPostIdRoute: typeof LayoutEditPostPostIdRoute
-  LayoutPostPostSlugRoute: typeof LayoutPostPostSlugRoute
-}
-
-const LayoutRouteChildren: LayoutRouteChildren = {
-  LayoutNewPostRoute: LayoutNewPostRoute,
-  LayoutSearchRoute: LayoutSearchRoute,
-  LayoutIndexRoute: LayoutIndexRoute,
-  LayoutEditPostPostIdRoute: LayoutEditPostPostIdRoute,
-  LayoutPostPostSlugRoute: LayoutPostPostSlugRoute,
-}
-
-const LayoutRouteWithChildren =
-  LayoutRoute._addFileChildren(LayoutRouteChildren)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/_auth/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitePostsSearchRoute = SitePostsSearchRouteImport.update({
+  id: '/posts/search',
+  path: '/posts/search',
+  getParentRoute: () => SiteRouteRoute,
+} as any)
+const SitePostsNewRoute = SitePostsNewRouteImport.update({
+  id: '/posts/new',
+  path: '/posts/new',
+  getParentRoute: () => SiteRouteRoute,
+} as any)
+const SitePostsSlugRoute = SitePostsSlugRouteImport.update({
+  id: '/posts/$slug',
+  path: '/posts/$slug',
+  getParentRoute: () => SiteRouteRoute,
+} as any)
+const SitePostsEditIdRoute = SitePostsEditIdRouteImport.update({
+  id: '/posts/edit/$id',
+  path: '/posts/edit/$id',
+  getParentRoute: () => SiteRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '': typeof LayoutRouteWithChildren
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/verify-email': typeof VerifyEmailRoute
-  '/new-post': typeof LayoutNewPostRoute
-  '/search': typeof LayoutSearchRoute
-  '/': typeof LayoutIndexRoute
-  '/admin/analytics': typeof AdminAdminAnalyticsRoute
-  '/admin/categories': typeof AdminAdminCategoriesRoute
-  '/admin/posts': typeof AdminAdminPostsRoute
-  '/admin/users': typeof AdminAdminUsersRoute
-  '/dashboard/draft': typeof DashboardDashboardDraftRoute
-  '/dashboard/library': typeof DashboardDashboardLibraryRoute
-  '/dashboard/profile': typeof DashboardDashboardProfileRoute
-  '/dashboard/published': typeof DashboardDashboardPublishedRoute
-  '/edit-post/$postId': typeof LayoutEditPostPostIdRoute
-  '/post/$postSlug': typeof LayoutPostPostSlugRoute
-  '/admin': typeof AdminAdminIndexRoute
-  '/dashboard': typeof DashboardDashboardIndexRoute
+  '/': typeof SiteIndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/login': typeof AuthLoginRoute
+  '/signup': typeof AuthSignupRoute
+  '/verify-email': typeof AuthVerifyEmailRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/posts': typeof AdminPostsRoute
+  '/admin/tags': typeof AdminTagsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/dashboard/bookmarks': typeof DashboardBookmarksRoute
+  '/dashboard/draft': typeof DashboardDraftRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/published': typeof DashboardPublishedRoute
+  '/admin/': typeof AdminIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/posts/$slug': typeof SitePostsSlugRoute
+  '/posts/new': typeof SitePostsNewRoute
+  '/posts/search': typeof SitePostsSearchRoute
+  '/posts/edit/$id': typeof SitePostsEditIdRoute
 }
-
 export interface FileRoutesByTo {
-  '': typeof DashboardRouteWithChildren
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/verify-email': typeof VerifyEmailRoute
-  '/new-post': typeof LayoutNewPostRoute
-  '/search': typeof LayoutSearchRoute
-  '/': typeof LayoutIndexRoute
-  '/admin/analytics': typeof AdminAdminAnalyticsRoute
-  '/admin/categories': typeof AdminAdminCategoriesRoute
-  '/admin/posts': typeof AdminAdminPostsRoute
-  '/admin/users': typeof AdminAdminUsersRoute
-  '/dashboard/draft': typeof DashboardDashboardDraftRoute
-  '/dashboard/library': typeof DashboardDashboardLibraryRoute
-  '/dashboard/profile': typeof DashboardDashboardProfileRoute
-  '/dashboard/published': typeof DashboardDashboardPublishedRoute
-  '/edit-post/$postId': typeof LayoutEditPostPostIdRoute
-  '/post/$postSlug': typeof LayoutPostPostSlugRoute
-  '/admin': typeof AdminAdminIndexRoute
-  '/dashboard': typeof DashboardDashboardIndexRoute
+  '/login': typeof AuthLoginRoute
+  '/signup': typeof AuthSignupRoute
+  '/verify-email': typeof AuthVerifyEmailRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/posts': typeof AdminPostsRoute
+  '/admin/tags': typeof AdminTagsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/dashboard/bookmarks': typeof DashboardBookmarksRoute
+  '/dashboard/draft': typeof DashboardDraftRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/published': typeof DashboardPublishedRoute
+  '/': typeof SiteIndexRoute
+  '/admin': typeof AdminIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/posts/$slug': typeof SitePostsSlugRoute
+  '/posts/new': typeof SitePostsNewRoute
+  '/posts/search': typeof SitePostsSearchRoute
+  '/posts/edit/$id': typeof SitePostsEditIdRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/_admin': typeof AdminRouteWithChildren
-  '/_dashboard': typeof DashboardRouteWithChildren
-  '/_layout': typeof LayoutRouteWithChildren
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
-  '/verify-email': typeof VerifyEmailRoute
-  '/_layout/new-post': typeof LayoutNewPostRoute
-  '/_layout/search': typeof LayoutSearchRoute
-  '/_layout/': typeof LayoutIndexRoute
-  '/_admin/admin/analytics': typeof AdminAdminAnalyticsRoute
-  '/_admin/admin/categories': typeof AdminAdminCategoriesRoute
-  '/_admin/admin/posts': typeof AdminAdminPostsRoute
-  '/_admin/admin/users': typeof AdminAdminUsersRoute
-  '/_dashboard/dashboard/draft': typeof DashboardDashboardDraftRoute
-  '/_dashboard/dashboard/library': typeof DashboardDashboardLibraryRoute
-  '/_dashboard/dashboard/profile': typeof DashboardDashboardProfileRoute
-  '/_dashboard/dashboard/published': typeof DashboardDashboardPublishedRoute
-  '/_layout/edit-post/$postId': typeof LayoutEditPostPostIdRoute
-  '/_layout/post/$postSlug': typeof LayoutPostPostSlugRoute
-  '/_admin/admin/': typeof AdminAdminIndexRoute
-  '/_dashboard/dashboard/': typeof DashboardDashboardIndexRoute
+  __root__: typeof rootRouteImport
+  '/_site': typeof SiteRouteRouteWithChildren
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/dashboard': typeof DashboardRouteRouteWithChildren
+  '/_auth/login': typeof AuthLoginRoute
+  '/_auth/signup': typeof AuthSignupRoute
+  '/_auth/verify-email': typeof AuthVerifyEmailRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/posts': typeof AdminPostsRoute
+  '/admin/tags': typeof AdminTagsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/dashboard/bookmarks': typeof DashboardBookmarksRoute
+  '/dashboard/draft': typeof DashboardDraftRoute
+  '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/published': typeof DashboardPublishedRoute
+  '/_site/': typeof SiteIndexRoute
+  '/admin/': typeof AdminIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/_site/posts/$slug': typeof SitePostsSlugRoute
+  '/_site/posts/new': typeof SitePostsNewRoute
+  '/_site/posts/search': typeof SitePostsSearchRoute
+  '/_site/posts/edit/$id': typeof SitePostsEditIdRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | ''
+    | '/'
+    | '/admin'
+    | '/dashboard'
     | '/login'
     | '/signup'
     | '/verify-email'
-    | '/new-post'
-    | '/search'
-    | '/'
     | '/admin/analytics'
     | '/admin/categories'
     | '/admin/posts'
+    | '/admin/tags'
     | '/admin/users'
+    | '/dashboard/bookmarks'
     | '/dashboard/draft'
-    | '/dashboard/library'
     | '/dashboard/profile'
     | '/dashboard/published'
-    | '/edit-post/$postId'
-    | '/post/$postSlug'
-    | '/admin'
-    | '/dashboard'
+    | '/admin/'
+    | '/dashboard/'
+    | '/posts/$slug'
+    | '/posts/new'
+    | '/posts/search'
+    | '/posts/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | ''
     | '/login'
     | '/signup'
     | '/verify-email'
-    | '/new-post'
-    | '/search'
-    | '/'
     | '/admin/analytics'
     | '/admin/categories'
     | '/admin/posts'
+    | '/admin/tags'
     | '/admin/users'
+    | '/dashboard/bookmarks'
     | '/dashboard/draft'
-    | '/dashboard/library'
     | '/dashboard/profile'
     | '/dashboard/published'
-    | '/edit-post/$postId'
-    | '/post/$postSlug'
+    | '/'
     | '/admin'
     | '/dashboard'
+    | '/posts/$slug'
+    | '/posts/new'
+    | '/posts/search'
+    | '/posts/edit/$id'
   id:
     | '__root__'
-    | '/_admin'
-    | '/_dashboard'
-    | '/_layout'
-    | '/login'
-    | '/signup'
-    | '/verify-email'
-    | '/_layout/new-post'
-    | '/_layout/search'
-    | '/_layout/'
-    | '/_admin/admin/analytics'
-    | '/_admin/admin/categories'
-    | '/_admin/admin/posts'
-    | '/_admin/admin/users'
-    | '/_dashboard/dashboard/draft'
-    | '/_dashboard/dashboard/library'
-    | '/_dashboard/dashboard/profile'
-    | '/_dashboard/dashboard/published'
-    | '/_layout/edit-post/$postId'
-    | '/_layout/post/$postSlug'
-    | '/_admin/admin/'
-    | '/_dashboard/dashboard/'
+    | '/_site'
+    | '/admin'
+    | '/dashboard'
+    | '/_auth/login'
+    | '/_auth/signup'
+    | '/_auth/verify-email'
+    | '/admin/analytics'
+    | '/admin/categories'
+    | '/admin/posts'
+    | '/admin/tags'
+    | '/admin/users'
+    | '/dashboard/bookmarks'
+    | '/dashboard/draft'
+    | '/dashboard/profile'
+    | '/dashboard/published'
+    | '/_site/'
+    | '/admin/'
+    | '/dashboard/'
+    | '/_site/posts/$slug'
+    | '/_site/posts/new'
+    | '/_site/posts/search'
+    | '/_site/posts/edit/$id'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
-  AdminRoute: typeof AdminRouteWithChildren
-  DashboardRoute: typeof DashboardRouteWithChildren
-  LayoutRoute: typeof LayoutRouteWithChildren
-  LoginRoute: typeof LoginRoute
-  SignupRoute: typeof SignupRoute
-  VerifyEmailRoute: typeof VerifyEmailRoute
+  SiteRouteRoute: typeof SiteRouteRouteWithChildren
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  DashboardRouteRoute: typeof DashboardRouteRouteWithChildren
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthSignupRoute: typeof AuthSignupRoute
+  AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  AdminRoute: AdminRouteWithChildren,
-  DashboardRoute: DashboardRouteWithChildren,
-  LayoutRoute: LayoutRouteWithChildren,
-  LoginRoute: LoginRoute,
-  SignupRoute: SignupRoute,
-  VerifyEmailRoute: VerifyEmailRoute,
-}
-
-export const routeTree = rootRoute
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/_admin",
-        "/_dashboard",
-        "/_layout",
-        "/login",
-        "/signup",
-        "/verify-email"
-      ]
-    },
-    "/_admin": {
-      "filePath": "_admin.tsx",
-      "children": [
-        "/_admin/admin/analytics",
-        "/_admin/admin/categories",
-        "/_admin/admin/posts",
-        "/_admin/admin/users",
-        "/_admin/admin/"
-      ]
-    },
-    "/_dashboard": {
-      "filePath": "_dashboard.tsx",
-      "children": [
-        "/_dashboard/dashboard/draft",
-        "/_dashboard/dashboard/library",
-        "/_dashboard/dashboard/profile",
-        "/_dashboard/dashboard/published",
-        "/_dashboard/dashboard/"
-      ]
-    },
-    "/_layout": {
-      "filePath": "_layout.tsx",
-      "children": [
-        "/_layout/new-post",
-        "/_layout/search",
-        "/_layout/",
-        "/_layout/edit-post/$postId",
-        "/_layout/post/$postSlug"
-      ]
-    },
-    "/login": {
-      "filePath": "login.tsx"
-    },
-    "/signup": {
-      "filePath": "signup.tsx"
-    },
-    "/verify-email": {
-      "filePath": "verify-email.tsx"
-    },
-    "/_layout/new-post": {
-      "filePath": "_layout/new-post.tsx",
-      "parent": "/_layout"
-    },
-    "/_layout/search": {
-      "filePath": "_layout/search.tsx",
-      "parent": "/_layout"
-    },
-    "/_layout/": {
-      "filePath": "_layout/index.tsx",
-      "parent": "/_layout"
-    },
-    "/_admin/admin/analytics": {
-      "filePath": "_admin/admin/analytics.tsx",
-      "parent": "/_admin"
-    },
-    "/_admin/admin/categories": {
-      "filePath": "_admin/admin/categories.tsx",
-      "parent": "/_admin"
-    },
-    "/_admin/admin/posts": {
-      "filePath": "_admin/admin/posts.tsx",
-      "parent": "/_admin"
-    },
-    "/_admin/admin/users": {
-      "filePath": "_admin/admin/users.tsx",
-      "parent": "/_admin"
-    },
-    "/_dashboard/dashboard/draft": {
-      "filePath": "_dashboard/dashboard/draft.tsx",
-      "parent": "/_dashboard"
-    },
-    "/_dashboard/dashboard/library": {
-      "filePath": "_dashboard/dashboard/library.tsx",
-      "parent": "/_dashboard"
-    },
-    "/_dashboard/dashboard/profile": {
-      "filePath": "_dashboard/dashboard/profile.tsx",
-      "parent": "/_dashboard"
-    },
-    "/_dashboard/dashboard/published": {
-      "filePath": "_dashboard/dashboard/published.tsx",
-      "parent": "/_dashboard"
-    },
-    "/_layout/edit-post/$postId": {
-      "filePath": "_layout/edit-post/$postId.tsx",
-      "parent": "/_layout"
-    },
-    "/_layout/post/$postSlug": {
-      "filePath": "_layout/post/$postSlug.tsx",
-      "parent": "/_layout"
-    },
-    "/_admin/admin/": {
-      "filePath": "_admin/admin/index.tsx",
-      "parent": "/_admin"
-    },
-    "/_dashboard/dashboard/": {
-      "filePath": "_dashboard/dashboard/index.tsx",
-      "parent": "/_dashboard"
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_site': {
+      id: '/_site'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof SiteRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/_site/': {
+      id: '/_site/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof SiteIndexRouteImport
+      parentRoute: typeof SiteRouteRoute
+    }
+    '/dashboard/published': {
+      id: '/dashboard/published'
+      path: '/published'
+      fullPath: '/dashboard/published'
+      preLoaderRoute: typeof DashboardPublishedRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/profile': {
+      id: '/dashboard/profile'
+      path: '/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof DashboardProfileRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/draft': {
+      id: '/dashboard/draft'
+      path: '/draft'
+      fullPath: '/dashboard/draft'
+      preLoaderRoute: typeof DashboardDraftRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/dashboard/bookmarks': {
+      id: '/dashboard/bookmarks'
+      path: '/bookmarks'
+      fullPath: '/dashboard/bookmarks'
+      preLoaderRoute: typeof DashboardBookmarksRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/tags': {
+      id: '/admin/tags'
+      path: '/tags'
+      fullPath: '/admin/tags'
+      preLoaderRoute: typeof AdminTagsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/posts': {
+      id: '/admin/posts'
+      path: '/posts'
+      fullPath: '/admin/posts'
+      preLoaderRoute: typeof AdminPostsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/_auth/verify-email': {
+      id: '/_auth/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof AuthVerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/signup': {
+      id: '/_auth/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof AuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_site/posts/search': {
+      id: '/_site/posts/search'
+      path: '/posts/search'
+      fullPath: '/posts/search'
+      preLoaderRoute: typeof SitePostsSearchRouteImport
+      parentRoute: typeof SiteRouteRoute
+    }
+    '/_site/posts/new': {
+      id: '/_site/posts/new'
+      path: '/posts/new'
+      fullPath: '/posts/new'
+      preLoaderRoute: typeof SitePostsNewRouteImport
+      parentRoute: typeof SiteRouteRoute
+    }
+    '/_site/posts/$slug': {
+      id: '/_site/posts/$slug'
+      path: '/posts/$slug'
+      fullPath: '/posts/$slug'
+      preLoaderRoute: typeof SitePostsSlugRouteImport
+      parentRoute: typeof SiteRouteRoute
+    }
+    '/_site/posts/edit/$id': {
+      id: '/_site/posts/edit/$id'
+      path: '/posts/edit/$id'
+      fullPath: '/posts/edit/$id'
+      preLoaderRoute: typeof SitePostsEditIdRouteImport
+      parentRoute: typeof SiteRouteRoute
     }
   }
 }
-ROUTE_MANIFEST_END */
+
+interface SiteRouteRouteChildren {
+  SiteIndexRoute: typeof SiteIndexRoute
+  SitePostsSlugRoute: typeof SitePostsSlugRoute
+  SitePostsNewRoute: typeof SitePostsNewRoute
+  SitePostsSearchRoute: typeof SitePostsSearchRoute
+  SitePostsEditIdRoute: typeof SitePostsEditIdRoute
+}
+
+const SiteRouteRouteChildren: SiteRouteRouteChildren = {
+  SiteIndexRoute: SiteIndexRoute,
+  SitePostsSlugRoute: SitePostsSlugRoute,
+  SitePostsNewRoute: SitePostsNewRoute,
+  SitePostsSearchRoute: SitePostsSearchRoute,
+  SitePostsEditIdRoute: SitePostsEditIdRoute,
+}
+
+const SiteRouteRouteWithChildren = SiteRouteRoute._addFileChildren(
+  SiteRouteRouteChildren,
+)
+
+interface AdminRouteRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminPostsRoute: typeof AdminPostsRoute
+  AdminTagsRoute: typeof AdminTagsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminPostsRoute: AdminPostsRoute,
+  AdminTagsRoute: AdminTagsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
+interface DashboardRouteRouteChildren {
+  DashboardBookmarksRoute: typeof DashboardBookmarksRoute
+  DashboardDraftRoute: typeof DashboardDraftRoute
+  DashboardProfileRoute: typeof DashboardProfileRoute
+  DashboardPublishedRoute: typeof DashboardPublishedRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
+  DashboardBookmarksRoute: DashboardBookmarksRoute,
+  DashboardDraftRoute: DashboardDraftRoute,
+  DashboardProfileRoute: DashboardProfileRoute,
+  DashboardPublishedRoute: DashboardPublishedRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteRouteWithChildren = DashboardRouteRoute._addFileChildren(
+  DashboardRouteRouteChildren,
+)
+
+const rootRouteChildren: RootRouteChildren = {
+  SiteRouteRoute: SiteRouteRouteWithChildren,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
+  DashboardRouteRoute: DashboardRouteRouteWithChildren,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthSignupRoute: AuthSignupRoute,
+  AuthVerifyEmailRoute: AuthVerifyEmailRoute,
+}
+export const routeTree = rootRouteImport
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()

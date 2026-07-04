@@ -15,7 +15,7 @@ type GetPresignedUrlInput = {
 	usage: MediaUsage;
 };
 
-type CreateMediaResponse = {
+type MediaResponse = {
 	media: Media;
 };
 
@@ -34,9 +34,9 @@ export const mediaApi = {
 			headers: { "Content-Type": file.type },
 		});
 	},
-	createMedia: async (input: CreateMediaInput): Promise<Media> => {
-		const res = await axiosInstance.post<CreateMediaResponse>("/media", input);
-		return res.data.media;
+	createMedia: async (input: CreateMediaInput): Promise<MediaResponse> => {
+		const res = await axiosInstance.post<MediaResponse>("/media", input);
+		return res.data;
 	},
 	deleteMedia: async (mediaId: string): Promise<void> => {
 		await axiosInstance.delete(`/media/${mediaId}`);

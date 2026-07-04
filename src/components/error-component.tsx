@@ -1,6 +1,5 @@
 import { useQueryErrorResetBoundary } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
-import { AlertTriangleIcon } from "lucide-react";
 import { useEffect } from "react";
 
 import {
@@ -11,6 +10,7 @@ import {
 } from "@/components/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { WarningIcon } from "@phosphor-icons/react";
 
 function ErrorComponent({ error }: { error: Error }) {
 	const router = useRouter();
@@ -22,10 +22,10 @@ function ErrorComponent({ error }: { error: Error }) {
 	}, [queryClientErrorBoundary]);
 
 	return (
-		<div className="mt-8 flex-center p-4">
+		<div className="mt-20 flex items-center justify-center  p-4">
 			<div className="w-full max-w-md">
 				<Alert variant="destructive">
-					<AlertTriangleIcon />
+					<WarningIcon size={32} />
 					<AlertTitle>Oops! something went wrong</AlertTitle>
 					<AlertDescription>
 						We're sorry, but we encountered an unexpected error.

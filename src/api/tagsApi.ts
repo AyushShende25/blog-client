@@ -9,7 +9,7 @@ import { QueryStaleTime } from "@/constants";
 import { handleApiError } from "@/lib/utils";
 import { toast } from "sonner";
 
-type TagsResponse = {
+type TagListResponse = {
 	tags: Tag[];
 };
 
@@ -21,19 +21,22 @@ type CreateTagInput = { name: string };
 type UpdateTagInput = { name: string };
 
 export const tagsApi = {
-	fetchAllTags: async (search?: string): Promise<Tag[]> => {
-		const res = await axiosInstance.get<TagsResponse>("/tags", {
+	fetchAllTags: async (search?: string): Promise<TagListResponse> => {
+		const res = await axiosInstance.get<TagListResponse>("/tags", {
 			params: { search },
 		});
-		return res.data.tags;
+		return res.data;
 	},
-	createTag: async (input: CreateTagInput): Promise<Tag> => {
+	createTag: async (input: CreateTagInput): Promise<TagResponse> => {
 		const res = await axiosInstance.post<TagResponse>("/tags", input);
-		return res.data.tag;
+		return res.data;
 	},
-	updateTag: async (id: string, input: UpdateTagInput): Promise<Tag> => {
+	updateTag: async (
+		id: string,
+		input: UpdateTagInput,
+	): Promise<TagResponse> => {
 		const res = await axiosInstance.patch<TagResponse>(`/tags/${id}`, input);
-		return res.data.tag;
+		return res.data;
 	},
 	deleteTag: async (id: string): Promise<void> => {
 		await axiosInstance.delete(`/tags/${id}`);

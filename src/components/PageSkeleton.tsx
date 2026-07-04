@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 function PageSkeleton() {
 	return (
-		<section className="pd-x pd-y">
+		<section>
 			<h1 className="text-5xl md:text-6xl lg:text-7xl tracking-wider py-6 text-center">
 				<Skeleton className="h-12 w-3/4 mx-auto" />
 				<Skeleton className="h-12 w-1/2 mx-auto mt-2" />
@@ -20,7 +20,6 @@ function PageSkeleton() {
 
 				<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
 					{Array.from({ length: 6 }).map((_, index) => (
-						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
 						<div key={index} className="space-y-4">
 							<Skeleton className="h-60 w-full" />
 							<Skeleton className="h-6 w-1/2" />
