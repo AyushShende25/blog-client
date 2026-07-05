@@ -24,7 +24,19 @@ export function ImageUploadButton({
 
 		// immediately show image to user and then upload in background
 		const blobUrl = URL.createObjectURL(file);
-		editor.chain().focus().setImage({ src: blobUrl }).run();
+		editor
+			.chain()
+			.focus()
+			.insertContent({
+				type: "image",
+				attrs: {
+					src: blobUrl,
+					alt: file.name,
+					uploading: true,
+					mediaId: null,
+				},
+			})
+			.run();
 
 		try {
 			setUploading(true);
@@ -46,8 +58,9 @@ export function ImageUploadButton({
 						editor.view.state.tr.setNodeMarkup(pos, undefined, {
 							...node.attrs,
 							src: fileUrl,
-							"data-uploading": null,
-							"data-media-id": mediaId,
+							alt: file.name,
+							mediaId,
+							uploading: false,
 						}),
 					);
 				}

@@ -2,7 +2,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import { EditorToolbar } from "./EditorToolbar";
-import Image from "@tiptap/extension-image";
+import { CustomImage } from "./CustomImage";
 
 type TextEditorProps = {
 	value?: string;
@@ -18,7 +18,7 @@ function TextEditor({ value, onChange, onImageUpload }: TextEditorProps) {
 				openOnClick: false,
 				autolink: true,
 			}),
-			Image,
+			CustomImage,
 		],
 		editorProps: {
 			attributes: {
