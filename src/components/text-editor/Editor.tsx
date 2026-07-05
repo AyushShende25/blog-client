@@ -7,10 +7,9 @@ import { CustomImage } from "./CustomImage";
 type TextEditorProps = {
 	value?: string;
 	onChange?: (html: string) => void;
-	onImageUpload?: (mediaId: string) => void;
 };
 
-function TextEditor({ value, onChange, onImageUpload }: TextEditorProps) {
+function TextEditor({ value, onChange }: TextEditorProps) {
 	const editor = useEditor({
 		extensions: [
 			StarterKit,
@@ -38,10 +37,7 @@ function TextEditor({ value, onChange, onImageUpload }: TextEditorProps) {
 	}
 	return (
 		<>
-			<EditorToolbar
-				editor={editor}
-				onImageUpload={(mediaId) => onImageUpload?.(mediaId)}
-			/>
+			<EditorToolbar editor={editor} />
 			<EditorContent editor={editor} />
 		</>
 	);
@@ -56,3 +52,5 @@ export default TextEditor;
 
 // Image flow
 // Select cat.png => Create blob URL => <img src="blob:abc" /> => Tiptap onUpdate => form.content temporarily has blob URL => Upload to S3 => fileUrl received => Find image with src="blob:abc" => Replace src with S3 URL => <img src="https://s3.../cat.png" /> => Tiptap onUpdate => form.content now has permanent URL
+
+// Earlier we used mediaIdsRef and onImageUpload, that worked because we did not had remove-image functionality so uploadedImages=mediaIds but after adding remove-image functionality, even after removing an image the mediaIdsRef would have that removed-image-id, hence now we scrape the mediaIds from the html-content and got rid of refs and onImageUpload

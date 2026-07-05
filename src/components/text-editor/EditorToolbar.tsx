@@ -23,13 +23,7 @@ import { ToolbarGroup } from "./ToolbarButton";
 import { LinkPopover } from "./LinkPopover";
 import { ImageUploadButton } from "./ImgUploadBtn";
 
-export function EditorToolbar({
-	editor,
-	onImageUpload,
-}: {
-	editor: Editor;
-	onImageUpload?: (mediaId: string) => void;
-}) {
+export function EditorToolbar({ editor }: { editor: Editor }) {
 	const editorState = useEditorState({
 		editor,
 		selector: menuBarStateSelector,
@@ -172,10 +166,7 @@ export function EditorToolbar({
 
 				<div className="flex items-center">
 					<span className="text-xs text-muted-foreground mr-1">Image:</span>
-					<ImageUploadButton
-						editor={editor}
-						onImageUpload={(mediaId) => onImageUpload?.(mediaId)}
-					/>
+					<ImageUploadButton editor={editor} />
 				</div>
 			</div>
 		</div>

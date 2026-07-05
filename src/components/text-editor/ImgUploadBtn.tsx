@@ -7,13 +7,9 @@ import { CircleNotchIcon, ImageIcon } from "@phosphor-icons/react";
 
 type ImageUploadButtonProps = {
 	editor: Editor;
-	onImageUpload: (mediaId: string) => void;
 };
 
-export function ImageUploadButton({
-	editor,
-	onImageUpload,
-}: ImageUploadButtonProps) {
+export function ImageUploadButton({ editor }: ImageUploadButtonProps) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [uploading, setUploading] = useState(false);
 
@@ -67,8 +63,6 @@ export function ImageUploadButton({
 			});
 
 			URL.revokeObjectURL(blobUrl);
-
-			onImageUpload?.(mediaId);
 		} catch (error) {
 			// If image-upload to s3 fails then remove the temporary blob preview.
 			editor.view.state.doc.descendants((node, pos) => {
