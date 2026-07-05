@@ -5,8 +5,7 @@ export const createPostFormSchema = z.object({
 		.string()
 		.trim()
 		.min(1, "Title cannot be empty")
-		.max(200, "Title must be less than 200 characters")
-		.transform((val) => val.replace(/\s+/g, " ")),
+		.max(200, "Title must be less than 200 characters"),
 	content: z.string().trim().optional(),
 	status: z.enum(["DRAFT", "PUBLISHED"]),
 	categories: z

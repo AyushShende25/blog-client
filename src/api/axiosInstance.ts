@@ -43,12 +43,6 @@ axiosInstance.interceptors.response.use(
 	(response) => response,
 	async (error) => {
 		const originalRequest = error.config as AxiosRequestConfig;
-		console.log(originalRequest.url);
-		console.log({
-  status: error.response?.status,
-  url: originalRequest.url,
-  _retry: originalRequest._retry,
-});
 		if (
 			error.response?.status !== 401 ||
 			originalRequest._retry ||
@@ -67,7 +61,7 @@ axiosInstance.interceptors.response.use(
 		isRefreshing = true;
 
 		try {
-			const refreshResponse = await axiosInstance.post("/auth/refresh"); console.log("Refresh succeeded:", refreshResponse.status);
+			await axiosInstance.post("/auth/refresh");
 			await processQueue();
 			return axiosInstance(originalRequest);
 		} catch (refreshError) {

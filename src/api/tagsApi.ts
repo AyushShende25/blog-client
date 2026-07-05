@@ -59,9 +59,19 @@ export function useCreateTag() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (data: CreateTagInput) => tagsApi.createTag(data),
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: tagKeys.all });
-			toast.success("Tag created");
+		onSuccess: ({ tag }) => {
+			queryClient.setQueryData(fetchTagsQueryOptions().queryKey, (oldData) => {
+				if (!oldData) {
+					return {
+						tags: [tag],
+					};
+				}
+
+				return {
+					...oldData,
+					tags: [...oldData.tags, tag],
+				};
+			});
 		},
 		onError: handleApiError,
 	});

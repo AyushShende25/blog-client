@@ -14,17 +14,20 @@ type MultiSelectProps = {
 	onChange: (value: Option[]) => void; // setSelectedOptions
 	placeholder?: string;
 	searchPlaceholder?: string;
+	onCreateOption?: (name: string) => Promise<Option>;
 };
 
 function MultiSelect({
 	options,
 	value,
 	onChange,
+	onCreateOption,
 	placeholder = "Select options",
 	searchPlaceholder = "Search...",
 }: MultiSelectProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState("");
+	const [isCreating, setIsCreating] = useState(false);
 
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const searchInputRef = useRef<HTMLInputElement>(null);
@@ -73,6 +76,30 @@ function MultiSelect({
 		option.name.toLowerCase().includes(searchTerm.toLowerCase()),
 	);
 
+	const normalizedSearchTerm = searchTerm.trim();
+	const optionExists = options.some(
+		(option) =>
+			option.name.toLowerCase() === normalizedSearchTerm.toLowerCase(),
+	);
+	const canCreate =
+		Boolean(onCreateOption) && normalizedSearchTerm.length > 0 && !optionExists;
+
+	const handleCreateOption = async () => {
+		if (!canCreate || !onCreateOption) {
+			return;
+		}
+		try {
+			setIsCreating(true);
+
+			const newOption = await onCreateOption(normalizedSearchTerm);
+
+			onChange([...value, newOption]);
+
+			setSearchTerm("");
+		} finally {
+			setIsCreating(false);
+		}
+	};
 	return (
 		<div ref={dropdownRef} className="relative w-full">
 			<div
@@ -136,7 +163,18 @@ function MultiSelect({
 					</div>
 
 					<ul className="max-h-60 overflow-y-auto p-1">
-						{filteredOptions.length === 0 && (
+						{canCreate && (
+							<li
+								onClick={handleCreateOption}
+								className="flex cursor-pointer items-center rounded-sm px-3 py-2 text-sm text-primary outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
+							>
+								{isCreating
+									? "Creating..."
+									: `Create "${normalizedSearchTerm}"`}
+							</li>
+						)}
+
+						{filteredOptions.length === 0 && !canCreate && (
 							<li className="px-3 py-6 text-center text-sm text-muted-foreground">
 								No options found.
 							</li>

@@ -2,28 +2,34 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import axios from "axios";
 import { toast } from "sonner";
-import { Comment } from "@/constants/types";
+import type { Comment } from "@/constants/types";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export function handleApiError(err: unknown) {
-	if (axios.isAxiosError(err)) {
-		const data = err.response?.data;
+type ApiError = {
+	message: string;
+	path?: string;
+};
 
-		if (Array.isArray(data)) {
-			data.forEach((m) => {
-				toast.error(m.message);
-			});
-		} else if (data?.message) {
-			toast.error(data.message);
-		} else {
-			toast.error("Request failed");
+export const getApiErrorMessage = (err: unknown) => {
+	if (axios.isAxiosError<ApiError[]>(err)) {
+		const errors = err.response?.data;
+
+		if (Array.isArray(errors) && errors.length > 0) {
+			return errors.map((error) => error.message).join(". ");
 		}
-	} else {
-		toast.error("Something went wrong");
+		return err.message || "Request failed";
 	}
+	if (err instanceof Error) {
+		return err.message;
+	}
+	return "Something went wrong. Please try again later.";
+};
+
+export function handleApiError(err: unknown) {
+	toast.error(getApiErrorMessage(err));
 }
 
 export const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -55,4 +61,14 @@ export const buildCommentsTree = (comments: Comment[]) => {
 	});
 
 	return roots;
+};
+
+export const extractMediaIds = (html: string): string[] => {
+	const document = new DOMParser().parseFromString(html, "text/html");
+
+	return Array.from(
+		document.querySelectorAll<HTMLImageElement>("img[data-media-id]"),
+	)
+		.map((image) => image.dataset.mediaId)
+		.filter((id): id is string => Boolean(id));
 };

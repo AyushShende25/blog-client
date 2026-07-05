@@ -14,26 +14,16 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchCategoriesQueryOptions } from "@/api/categoriesApi";
-import {
-	Combobox,
-	ComboboxChip,
-	ComboboxChips,
-	ComboboxChipsInput,
-	ComboboxContent,
-	ComboboxEmpty,
-	ComboboxItem,
-	ComboboxList,
-	ComboboxValue,
-	useComboboxAnchor,
-} from "@/components/ui/combobox";
-import { fetchTagsQueryOptions, tagKeys, tagsApi } from "@/api/tagsApi";
-import { useRef, useState } from "react";
+import { fetchTagsQueryOptions, useCreateTag } from "@/api/tagsApi";
+import { useEffect, useState } from "react";
 import Editor from "@/components/text-editor/Editor";
 import { useCreatePost } from "@/api/postsApi";
 import { putToS3 } from "@/api/mediaApi";
 import { FilePlusIcon, XIcon } from "@phosphor-icons/react";
+import MultiSelect from "@/components/MultiSelect";
+import { extractMediaIds, getApiErrorMessage } from "@/lib/utils";
 
 export const Route = createFileRoute("/_site/posts/new")({
 	component: RouteComponent,
@@ -46,10 +36,22 @@ export const Route = createFileRoute("/_site/posts/new")({
 });
 
 function RouteComponent() {
-	const mediaIdsRef = useRef<string[]>([]); // used useRef instead of useState because we don't use media-ids in the jsx, so ref gives us persistent mutable container across rerenders and doesn't cause rerender on mutating.
-	const queryClient = useQueryClient();
+	const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
+
 	const createPostMutation = useCreatePost();
+	const createTagMutation = useCreateTag();
 	const navigate = useNavigate();
+	const categoriesQuery = useQuery(fetchCategoriesQueryOptions());
+	const tagsQuery = useQuery(fetchTagsQueryOptions());
+
+	useEffect(() => {
+		return () => {
+			if (coverPreviewUrl) {
+				URL.revokeObjectURL(coverPreviewUrl);
+			}
+		};
+	}, [coverPreviewUrl]);
+
 	const form = useForm({
 		defaultValues: {
 			title: "",
@@ -60,79 +62,38 @@ function RouteComponent() {
 			tags: [] as Tag[],
 		} as CreatePostFormInput,
 		validators: {
-			onSubmit: createPostFormSchema,
-		},
-		onSubmit: async ({ value }) => {
-			const coverImageUrl = value.coverImage
-				? await putToS3(value.coverImage, "POST")
-				: undefined;
+			onChange: createPostFormSchema,
+			onSubmitAsync: async ({ value }) => {
+				try {
+					const coverImageUrl = value.coverImage
+						? await putToS3(value.coverImage, "POST")
+						: undefined;
+					const mediaIds = extractMediaIds(value.content ?? "");
+					await createPostMutation.mutateAsync({
+						title: value.title,
+						content: value.content,
+						status: value.status,
+						coverImage: coverImageUrl,
+						categories: value.categories.map((c) => c.id),
+						tags: value.tags.map((t) => t.id),
+						media: mediaIds,
+					});
+					navigate({
+						to:
+							value.status === POST_STATUS.PUBLISHED
+								? "/dashboard/published"
+								: "/dashboard/draft",
+					});
 
-			await createPostMutation.mutateAsync(
-				{
-					title: value.title,
-					content: value.content,
-					status: value.status,
-					coverImage: coverImageUrl,
-					categories: value.categories.map((c) => c.id),
-					tags: value.tags.map((t) => t.id),
-					media: mediaIdsRef.current,
-				},
-				{
-					onSuccess: () => {
-						navigate({
-							to:
-								value.status === "PUBLISHED"
-									? "/dashboard/published"
-									: "/dashboard/draft",
-						});
-					},
-				},
-			);
+					return null;
+				} catch (error: unknown) {
+					return getApiErrorMessage(error);
+				}
+			},
 		},
 	});
 
-	const { data: categoriesData } = useQuery(fetchCategoriesQueryOptions());
-	const { data: tagsData } = useQuery(fetchTagsQueryOptions());
-	const tags = tagsData?.tags;
-	const categories = categoriesData?.categories;
-
-	const categoriesAnchor = useComboboxAnchor();
-	const tagsAnchor = useComboboxAnchor();
-
-	const [tagQuery, setTagQuery] = useState("");
-	const normalizedQuery = tagQuery.trim().toLowerCase();
-
-	const tagExists = tags?.some((tag) => tag.name === normalizedQuery) ?? false;
-
-	const filteredTags = tags
-		? tagQuery
-			? tags?.filter((tag) => tag.name.includes(normalizedQuery))
-			: tags
-		: [];
-
-	const handleCreateTag = async (field: any) => {
-		if (!normalizedQuery) return;
-
-		const exists = field.state.value.some(
-			(t: Tag) => t.name.toLowerCase() === normalizedQuery,
-		);
-
-		if (exists) return;
-		if (field.state.value.length >= 5) return;
-		const { tag: newTag } = await tagsApi.createTag({ name: normalizedQuery });
-		queryClient.setQueryData(tagKeys.all, (old: Tag[] = []) => [
-			...old,
-			newTag,
-		]);
-
-		field.handleChange([...field.state.value, newTag]);
-
-		setTagQuery("");
-	};
-
-	const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
-
-	const handleCoverImageChange = async (
+	const handleCoverImageChange = (
 		e: React.ChangeEvent<HTMLInputElement>,
 		setFile: (f: File | undefined) => void,
 	) => {
@@ -140,17 +101,11 @@ function RouteComponent() {
 		e.target.value = "";
 		if (!file) return;
 
-		if (coverPreviewUrl?.startsWith("blob:")) {
-			URL.revokeObjectURL(coverPreviewUrl);
-		}
 		setCoverPreviewUrl(URL.createObjectURL(file));
 		setFile(file);
 	};
 
 	const removeCoverImage = (setFile: (f: File | undefined) => void) => {
-		if (coverPreviewUrl?.startsWith("blob:")) {
-			URL.revokeObjectURL(coverPreviewUrl);
-		}
 		setCoverPreviewUrl(null);
 		setFile(undefined);
 	};
@@ -251,45 +206,14 @@ function RouteComponent() {
 								const isInvalid =
 									field.state.meta.isTouched && !field.state.meta.isValid;
 								return (
-									<Field data-invalid={isInvalid} className="h-full">
-										<Combobox
-											aria-invalid={isInvalid}
-											multiple
-											autoHighlight
-											items={categories ?? []}
-											value={field.state.value}
-											onValueChange={(vals) => {
-												if (vals.length <= 3) field.handleChange(vals);
-											}}
-										>
-											<ComboboxChips
-												ref={categoriesAnchor}
-												className="w-full h-full min-h-10 bg-transparent dark:bg-transparent border-none focus-visible:ring-0 shadow-none focus-within:ring-0"
-											>
-												<ComboboxValue>
-													{(values: Category[]) => (
-														<>
-															{values.map((item: Category) => (
-																<ComboboxChip key={item.id}>
-																	{item.name}
-																</ComboboxChip>
-															))}
-															<ComboboxChipsInput placeholder="Add upto 3 categories..." />
-														</>
-													)}
-												</ComboboxValue>
-											</ComboboxChips>
-											<ComboboxContent anchor={categoriesAnchor}>
-												<ComboboxEmpty>No categories found.</ComboboxEmpty>
-												<ComboboxList>
-													{(item: Category) => (
-														<ComboboxItem key={item.id} value={item}>
-															{item.name}
-														</ComboboxItem>
-													)}
-												</ComboboxList>
-											</ComboboxContent>
-										</Combobox>
+									<Field data-invalid={isInvalid}>
+										<MultiSelect
+											options={categoriesQuery.data?.categories ?? []}
+											value={field.state.value ?? []}
+											onChange={field.handleChange}
+											placeholder="Select categories"
+											searchPlaceholder="Search categories..."
+										/>
 										{isInvalid && (
 											<FieldError errors={field.state.meta.errors} />
 										)}
@@ -304,103 +228,20 @@ function RouteComponent() {
 									field.state.meta.isTouched && !field.state.meta.isValid;
 								return (
 									<Field data-invalid={isInvalid}>
-										<Combobox
-											aria-invalid={isInvalid}
-											multiple
-											autoHighlight
-											items={filteredTags ?? []}
-											value={field.state.value}
-											onValueChange={(vals: Tag[]) => {
-												if (vals.length <= 5) {
-													field.handleChange(vals);
-													setTagQuery("");
-												}
-											}}
-										>
-											<ComboboxChips
-												ref={tagsAnchor}
-												className="w-full h-full min-h-10 bg-transparent dark:bg-transparent border-none focus-visible:ring-0 shadow-none focus-within:ring-0"
-											>
-												<ComboboxValue>
-													{(values: Tag[]) => {
-														return (
-															<>
-																{values.map((item: Tag) => (
-																	<ComboboxChip key={item?.id}>
-																		{item?.name}
-																	</ComboboxChip>
-																))}
-																<ComboboxChipsInput
-																	placeholder="Add up to 5 tags..."
-																	value={tagQuery}
-																	onChange={(e) => setTagQuery(e.target.value)}
-																	onKeyDown={(e) => {
-																		if (
-																			e.key === "Enter" &&
-																			tagQuery &&
-																			!tagExists
-																		) {
-																			e.preventDefault();
-																			handleCreateTag(field);
-																		}
-																	}}
-																/>
-															</>
-														);
-													}}
-												</ComboboxValue>
-											</ComboboxChips>
-											<ComboboxContent anchor={tagsAnchor}>
-												<ComboboxEmpty>No tags found.</ComboboxEmpty>
+										<MultiSelect
+											options={tagsQuery.data?.tags ?? []}
+											value={field.state.value ?? []}
+											onChange={field.handleChange}
+											onCreateOption={async (name) => {
+												const { tag } = await createTagMutation.mutateAsync({
+													name,
+												});
 
-												<ComboboxList>
-													{(item: Tag) => (
-														<ComboboxItem key={item.id} value={item}>
-															{item.name}
-														</ComboboxItem>
-													)}
-												</ComboboxList>
-												{tagQuery &&
-													!tagExists &&
-													field.state.value.length < 5 && (
-														<ComboboxItem
-															onMouseDown={(e) => {
-																e.preventDefault();
-																e.stopPropagation();
-															}}
-															onClick={async () => {
-																await handleCreateTag(field);
-															}}
-														>
-															Create "{tagQuery}"
-														</ComboboxItem>
-													)}
-											</ComboboxContent>
-										</Combobox>
-										{isInvalid && (
-											<FieldError errors={field.state.meta.errors} />
-										)}
-									</Field>
-								);
-							}}
-						/>
-					</div>
-					<div>
-						<form.Field
-							name="content"
-							children={(field) => {
-								const isInvalid =
-									field.state.meta.isTouched && !field.state.meta.isValid;
-								return (
-									<Field data-invalid={isInvalid}>
-										<Editor
-											value={field.state.value}
-											onChange={(html) => field.handleChange(html)}
-											onImageUpload={(mediaId) => {
-												mediaIdsRef.current = [...mediaIdsRef.current, mediaId];
+												return tag;
 											}}
+											placeholder="Select tags"
+											searchPlaceholder="Search tags..."
 										/>
-
 										{isInvalid && (
 											<FieldError errors={field.state.meta.errors} />
 										)}
@@ -409,32 +250,72 @@ function RouteComponent() {
 							}}
 						/>
 					</div>
+
+					<form.Field
+						name="content"
+						children={(field) => {
+							const isInvalid =
+								field.state.meta.isTouched && !field.state.meta.isValid;
+							return (
+								<Field data-invalid={isInvalid}>
+									<Editor
+										value={field.state.value}
+										onChange={field.handleChange}
+									/>
+
+									{isInvalid && <FieldError errors={field.state.meta.errors} />}
+								</Field>
+							);
+						}}
+					/>
 				</FieldGroup>
 			</form>
+			<form.Subscribe
+				selector={(state) => [state.errorMap]}
+				children={([errorMap]) =>
+					errorMap.onSubmit ? (
+						<div>
+							<em className="text-destructive font-light">
+								Form-Error: {errorMap.onSubmit}
+							</em>
+						</div>
+					) : null
+				}
+			/>
 			<div className="flex gap-4">
-				<Button
-					type="button"
-					size="lg"
-					className="cursor-pointer"
-					onClick={() => {
-						form.setFieldValue("status", POST_STATUS.PUBLISHED);
-						form.handleSubmit();
-					}}
-				>
-					Publish
-				</Button>
-				<Button
-					type="button"
-					size="lg"
-					className="cursor-pointer"
-					variant="outline"
-					onClick={() => {
-						form.setFieldValue("status", POST_STATUS.DRAFT);
-						form.handleSubmit();
-					}}
-				>
-					Save Draft
-				</Button>
+				<form.Subscribe
+					selector={(state) => [state.canSubmit, state.isSubmitting]}
+					children={([canSubmit, isSubmitting]) => (
+						<div className="flex gap-4">
+							<Button
+								type="button"
+								size="lg"
+								className="cursor-pointer"
+								disabled={!canSubmit || isSubmitting}
+								onClick={() => {
+									form.setFieldValue("status", POST_STATUS.PUBLISHED);
+									form.handleSubmit();
+								}}
+							>
+								Publish
+							</Button>
+
+							<Button
+								type="button"
+								size="lg"
+								variant="outline"
+								className="cursor-pointer"
+								disabled={!canSubmit || isSubmitting}
+								onClick={() => {
+									form.setFieldValue("status", POST_STATUS.DRAFT);
+									form.handleSubmit();
+								}}
+							>
+								Save Draft
+							</Button>
+						</div>
+					)}
+				/>
 			</div>
 		</main>
 	);
