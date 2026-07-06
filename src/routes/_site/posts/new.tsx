@@ -3,27 +3,26 @@ import {
 	type CreatePostFormInput,
 	createPostFormSchema,
 } from "@/constants/schema";
-import { type Category, POST_STATUS, type Tag } from "@/constants/types";
+import {
+	type Category,
+	type CoverImageValue,
+	POST_STATUS,
+	type Tag,
+} from "@/constants/types";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import {
-	Field,
-	FieldError,
-	FieldGroup,
-	FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldError, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { fetchCategoriesQueryOptions } from "@/api/categoriesApi";
 import { fetchTagsQueryOptions, useCreateTag } from "@/api/tagsApi";
-import { useEffect, useState } from "react";
 import Editor from "@/components/text-editor/Editor";
 import { useCreatePost } from "@/api/postsApi";
 import { putToS3 } from "@/api/mediaApi";
-import { FilePlusIcon, XIcon } from "@phosphor-icons/react";
 import MultiSelect from "@/components/MultiSelect";
 import { extractMediaIds, getApiErrorMessage } from "@/lib/utils";
+import CoverImageInput from "@/components/CoverImageInput";
 
 export const Route = createFileRoute("/_site/posts/new")({
 	component: RouteComponent,
@@ -36,28 +35,18 @@ export const Route = createFileRoute("/_site/posts/new")({
 });
 
 function RouteComponent() {
-	const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
-
 	const createPostMutation = useCreatePost();
 	const createTagMutation = useCreateTag();
 	const navigate = useNavigate();
 	const categoriesQuery = useQuery(fetchCategoriesQueryOptions());
 	const tagsQuery = useQuery(fetchTagsQueryOptions());
 
-	useEffect(() => {
-		return () => {
-			if (coverPreviewUrl) {
-				URL.revokeObjectURL(coverPreviewUrl);
-			}
-		};
-	}, [coverPreviewUrl]);
-
 	const form = useForm({
 		defaultValues: {
 			title: "",
 			content: "",
 			status: POST_STATUS.DRAFT,
-			coverImage: undefined as File | undefined,
+			coverImage: undefined as CoverImageValue,
 			categories: [] as Category[],
 			tags: [] as Tag[],
 		} as CreatePostFormInput,
@@ -65,19 +54,23 @@ function RouteComponent() {
 			onChange: createPostFormSchema,
 			onSubmitAsync: async ({ value }) => {
 				try {
-					const coverImageUrl = value.coverImage
-						? await putToS3(value.coverImage, "POST")
-						: undefined;
+					const coverImageUrl =
+						value.coverImage instanceof File
+							? await putToS3(value.coverImage, "POST")
+							: undefined;
+
 					const mediaIds = extractMediaIds(value.content ?? "");
+
 					await createPostMutation.mutateAsync({
 						title: value.title,
 						content: value.content,
 						status: value.status,
 						coverImage: coverImageUrl,
-						categories: value.categories.map((c) => c.id),
-						tags: value.tags.map((t) => t.id),
-						media: mediaIds,
+						categoryIds: value.categories.map((c) => c.id),
+						tagIds: value.tags.map((t) => t.id),
+						mediaIds: mediaIds,
 					});
+
 					navigate({
 						to:
 							value.status === POST_STATUS.PUBLISHED
@@ -92,23 +85,6 @@ function RouteComponent() {
 			},
 		},
 	});
-
-	const handleCoverImageChange = (
-		e: React.ChangeEvent<HTMLInputElement>,
-		setFile: (f: File | undefined) => void,
-	) => {
-		const file = e.target.files?.[0];
-		e.target.value = "";
-		if (!file) return;
-
-		setCoverPreviewUrl(URL.createObjectURL(file));
-		setFile(file);
-	};
-
-	const removeCoverImage = (setFile: (f: File | undefined) => void) => {
-		setCoverPreviewUrl(null);
-		setFile(undefined);
-	};
 
 	return (
 		<main className="container px-4 sm:px-10 lg:px-14">
@@ -131,45 +107,11 @@ function RouteComponent() {
 								field.state.meta.isTouched && !field.state.meta.isValid;
 							return (
 								<Field className="w-fit" data-invalid={isInvalid}>
-									{coverPreviewUrl ? (
-										<div className="relative w-fit">
-											<img
-												src={coverPreviewUrl}
-												alt="Cover preview"
-												className="h-40 rounded-md object-cover"
-											/>
-											<Button
-												type="button"
-												size="icon"
-												variant="destructive"
-												className="absolute -top-2 -right-2 size-6"
-												onClick={() => removeCoverImage(field.handleChange)}
-											>
-												<XIcon className="size-3" />
-											</Button>
-										</div>
-									) : (
-										<>
-											<FieldLabel
-												className="px-3 py-3 cursor-pointer rounded-sm min-h-10 border border-input bg-background hover:bg-background/50 transition-colors duration-300"
-												htmlFor={field.name}
-											>
-												<FilePlusIcon size={32} />
-											</FieldLabel>
-											<Input
-												id={field.name}
-												name={field.name}
-												onBlur={field.handleBlur}
-												onChange={(e) =>
-													handleCoverImageChange(e, field.handleChange)
-												}
-												aria-invalid={isInvalid}
-												type="file"
-												accept="image/*"
-												className="hidden z-20"
-											/>
-										</>
-									)}
+									<CoverImageInput
+										value={field.state.value}
+										onChange={field.handleChange}
+										onBlur={field.handleBlur}
+									/>
 
 									{isInvalid && <FieldError errors={field.state.meta.errors} />}
 								</Field>

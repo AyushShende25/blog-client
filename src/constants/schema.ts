@@ -26,10 +26,13 @@ export const createPostFormSchema = z.object({
 		)
 		.min(1, "Provide at least one tag")
 		.max(5, "Maximum 5 tags allowed"),
+
 	coverImage: z
-		.file()
-		.max(10_000_000)
-		.mime(["image/png", "image/jpeg", "image/webp"])
+		.union([
+			z.url(),
+			z.file().max(10_000_000).mime(["image/png", "image/jpeg", "image/webp"]),
+			z.null(),
+		])
 		.optional(),
 });
 export type CreatePostFormInput = z.infer<typeof createPostFormSchema>;
@@ -59,9 +62,11 @@ export const updatePostFormSchema = z.object({
 		.max(5, "Maximum 5 tags allowed")
 		.optional(),
 	coverImage: z
-		.file()
-		.max(10_000_000)
-		.mime(["image/png", "image/jpeg", "image/webp"])
+		.union([
+			z.url(),
+			z.file().max(10_000_000).mime(["image/png", "image/jpeg", "image/webp"]),
+			z.null(),
+		])
 		.optional(),
 });
 export type UpdatePostFormInput = z.infer<typeof updatePostFormSchema>;

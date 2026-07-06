@@ -28,20 +28,20 @@ type CreatePostInput = {
 	title: string;
 	content?: string;
 	status: PostStatus;
-	categories: string[];
-	tags: string[];
-	media?: string[];
-	coverImage?: string;
+	categoryIds: string[];
+	tagIds: string[];
+	mediaIds?: string[];
+	coverImage?: string | null;
 };
 
 type UpdatePostInput = {
 	title?: string;
 	content?: string;
 	status?: PostStatus;
-	categories?: string[];
-	tags?: string[];
-	media?: string[];
-	coverImage?: string;
+	categoryIds?: string[];
+	tagIds?: string[];
+	mediaIds?: string[];
+	coverImage?: string | null;
 };
 
 type PostListResponse = {

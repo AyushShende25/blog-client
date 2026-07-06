@@ -132,3 +132,5 @@ export type Comment = {
 	avatar: string | undefined;
 	replies: Comment[];
 };
+
+export type CoverImageValue = string | File | null | undefined;
