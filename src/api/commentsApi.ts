@@ -8,6 +8,7 @@ import {
 	useMutation,
 	useQueryClient,
 } from "@tanstack/react-query";
+import { postKeys } from "./postsApi";
 
 type FetchCommentsParams = {
 	page?: number;
@@ -91,7 +92,7 @@ export const commentKeys = {
 	post: (postId: string) => [...commentKeys.all, "post", postId] as const,
 	list: (postId: string, limit?: number) =>
 		[...commentKeys.post(postId), "list", limit ?? null] as const,
-	count: (postId: string) => [postId, "post", "count"] as const,
+	count: (postId: string) => [...commentKeys.post(postId), "count"] as const,
 };
 
 const DEFAULT_LIMIT = 20;
@@ -131,7 +132,7 @@ export function useCreateComment() {
 				queryKey: commentKeys.post(postId),
 			});
 			queryClient.invalidateQueries({
-				queryKey: commentKeys.count(postId),
+				queryKey: postKeys.published(),
 			});
 		},
 		onError: handleApiError,
@@ -143,7 +144,6 @@ export function useUpdateComment() {
 	return useMutation({
 		mutationFn: ({
 			commentId,
-			postId,
 			content,
 		}: {
 			commentId: string;
@@ -162,20 +162,15 @@ export function useUpdateComment() {
 export function useDeleteComment() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: ({
-			commentId,
-			postId,
-		}: {
-			commentId: string;
-			postId: string;
-		}) => commentsApi.remove(commentId),
+		mutationFn: ({ commentId }: { commentId: string; postId: string }) =>
+			commentsApi.remove(commentId),
 
 		onSuccess: (_data, { postId }) => {
 			queryClient.invalidateQueries({
 				queryKey: commentKeys.post(postId),
 			});
 			queryClient.invalidateQueries({
-				queryKey: commentKeys.count(postId),
+				queryKey: postKeys.published(),
 			});
 		},
 

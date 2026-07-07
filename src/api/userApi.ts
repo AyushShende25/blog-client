@@ -11,6 +11,9 @@ import { putToS3 } from "./mediaApi";
 import { handleApiError } from "@/lib/utils";
 import { authKeys } from "./authApi";
 import { QueryStaleTime } from "@/constants";
+import { postKeys } from "./postsApi";
+import { useNavigate } from "@tanstack/react-router";
+import { commentKeys } from "./commentsApi";
 
 type UpdateMeInput = {
 	bio?: string;
@@ -158,14 +161,24 @@ export const userApi = {
 
 export const userKeys = {
 	all: ["users"] as const,
-	list: (params: GetUsersFilters) => [...userKeys.all, params] as const,
-	user: (userId: string) => [...userKeys.all, userId] as const,
+
+	lists: () => [...userKeys.all, "list"] as const,
+
+	list: (params: GetUsersFilters) => [...userKeys.lists(), params] as const,
+
+	details: () => [...userKeys.all, "detail"] as const,
+
+	user: (userId: string) => [...userKeys.details(), userId] as const,
+
 	followers: (userId: string, params: GetFollowsParams) =>
 		[...userKeys.user(userId), "followers", params] as const,
+
 	following: (userId: string, params: GetFollowsParams) =>
 		[...userKeys.user(userId), "following", params] as const,
+
 	isFollowing: (userId: string) =>
-		[...userKeys.user(userId), "isFollowing"] as const,
+		[...userKeys.user(userId), "is-following"] as const,
+
 	stats: (userId: string) => [...userKeys.user(userId), "stats"] as const,
 };
 
@@ -221,7 +234,22 @@ export function useUpdateMe() {
 	return useMutation({
 		mutationFn: userApi.updateMe,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: authKeys.me });
+			queryClient.invalidateQueries({
+				queryKey: authKeys.me,
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: postKeys.all,
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: userKeys.all,
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: commentKeys.all,
+			});
+
 			toast.success("Updated user data");
 		},
 		onError: handleApiError,
@@ -230,11 +258,17 @@ export function useUpdateMe() {
 
 export function useDeleteMe() {
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 	return useMutation({
 		mutationFn: userApi.deleteMe,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: authKeys.me });
+		onSuccess: async () => {
+			queryClient.clear();
+
 			toast.success("Removed user account");
+
+			await navigate({
+				to: "/",
+			});
 		},
 		onError: handleApiError,
 	});
@@ -251,7 +285,21 @@ export function useUpdateUser() {
 			input: UpdateUserInput;
 		}) => userApi.update(userId, input),
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: userKeys.all });
+			queryClient.invalidateQueries({
+				queryKey: userKeys.all,
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: postKeys.all,
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: commentKeys.all,
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: authKeys.me,
+			});
 			toast.success("Updated user data");
 		},
 		onError: handleApiError,
@@ -263,7 +311,17 @@ export function useDeleteUser() {
 	return useMutation({
 		mutationFn: userApi.delete,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: userKeys.all });
+			queryClient.invalidateQueries({
+				queryKey: userKeys.all,
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: postKeys.all,
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: commentKeys.all,
+			});
 			toast.success("Removed user account");
 		},
 		onError: handleApiError,
@@ -275,10 +333,25 @@ export function useUpdateAvatar() {
 	return useMutation({
 		mutationFn: async (file: File) => {
 			const fileUrl = await putToS3(file, MEDIA_USAGE.AVATAR);
-			await userApi.updateMe({ avatar: fileUrl });
+			return userApi.updateMe({ avatar: fileUrl });
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: authKeys.me });
+			queryClient.invalidateQueries({
+				queryKey: authKeys.me,
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: postKeys.all,
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: userKeys.all,
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: commentKeys.all,
+			});
+
 			toast.success("Updated user data");
 		},
 		onError: handleApiError,
@@ -289,9 +362,9 @@ export function useFollow() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: userApi.follow,
-		onSuccess: (_data, userId) => {
+		onSuccess: () => {
 			queryClient.invalidateQueries({
-				queryKey: userKeys.user(userId),
+				queryKey: userKeys.all,
 			});
 		},
 		onError: handleApiError,
@@ -302,8 +375,10 @@ export function useUnfollow() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: userApi.unfollow,
-		onSuccess: (_data, userId) => {
-			queryClient.invalidateQueries({ queryKey: userKeys.user(userId) });
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: userKeys.all,
+			});
 		},
 		onError: handleApiError,
 	});

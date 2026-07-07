@@ -8,6 +8,7 @@ import {
 	useMutation,
 	useQueryClient,
 } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -70,10 +71,15 @@ export const userQueryOptions = () =>
 
 export function useLogout() {
 	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 	return useMutation({
 		mutationFn: authApi.logout,
-		onSettled: () => {
+		onSettled: async () => {
 			queryClient.clear();
+
+			await navigate({
+				to: "/login",
+			});
 		},
 	});
 }
@@ -85,27 +91,27 @@ export function useLogin() {
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({ queryKey: authKeys.me });
 		},
+		onError: handleApiError,
 	});
 }
 
 export function useSignup() {
-	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: authApi.signup,
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: authKeys.me });
-			toast.success("User registered successfully. Please verify you email.");
+			toast.success("User registered successfully. Please verify your email.");
 		},
+		onError: handleApiError,
 	});
 }
 
 export function useVerifyEmail() {
-	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 	return useMutation({
 		mutationFn: authApi.verifyEmail,
 		onSuccess: async () => {
-			await queryClient.invalidateQueries({ queryKey: authKeys.me });
 			toast.success("User verified successfully.");
+			await navigate({ to: "/login" });
 		},
 		onError: handleApiError,
 	});

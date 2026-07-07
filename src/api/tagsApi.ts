@@ -45,7 +45,10 @@ export const tagsApi = {
 
 export const tagKeys = {
 	all: ["tags"] as const,
-	list: (search?: string) => [...tagKeys.all, { search }] as const,
+
+	lists: () => [...tagKeys.all, "list"] as const,
+
+	list: (search?: string) => [...tagKeys.lists(), { search }] as const,
 };
 
 export const fetchTagsQueryOptions = (search?: string) =>
@@ -60,7 +63,7 @@ export function useCreateTag() {
 	return useMutation({
 		mutationFn: (data: CreateTagInput) => tagsApi.createTag(data),
 		onSuccess: ({ tag }) => {
-			queryClient.setQueryData(fetchTagsQueryOptions().queryKey, (oldData) => {
+			queryClient.setQueryData<TagListResponse>(tagKeys.list(), (oldData) => {
 				if (!oldData) {
 					return {
 						tags: [tag],

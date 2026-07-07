@@ -6,6 +6,7 @@ import {
 import { axiosInstance } from "./axiosInstance";
 import { QueryStaleTime } from "@/constants";
 import { handleApiError } from "@/lib/utils";
+import { postKeys } from "./postsApi";
 
 type LikesCountResponse = {
 	count: number;
@@ -44,8 +45,13 @@ export const likesApi = {
 };
 
 export const likeKeys = {
-	count: (postId: string) => ["likes", "post", postId] as const,
-	status: (postId: string) => ["likes", "status", "post", postId] as const,
+	all: ["likes"] as const,
+
+	post: (postId: string) => [...likeKeys.all, "post", postId] as const,
+
+	count: (postId: string) => [...likeKeys.post(postId), "count"] as const,
+
+	status: (postId: string) => [...likeKeys.post(postId), "status"] as const,
 };
 
 export const fetchLikesCountQueryOptions = (postId: string) =>
@@ -67,8 +73,13 @@ export function useCreateLike() {
 	return useMutation({
 		mutationFn: (postId: string) => likesApi.create(postId),
 		onSuccess: (_data, postId) => {
-			queryClient.invalidateQueries({ queryKey: likeKeys.count(postId) });
-			queryClient.invalidateQueries({ queryKey: likeKeys.status(postId) });
+			queryClient.invalidateQueries({
+				queryKey: likeKeys.post(postId),
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: postKeys.published(),
+			});
 		},
 		onError: handleApiError,
 	});
@@ -79,8 +90,13 @@ export function useRemoveLike() {
 	return useMutation({
 		mutationFn: (postId: string) => likesApi.remove(postId),
 		onSuccess: (_data, postId) => {
-			queryClient.invalidateQueries({ queryKey: likeKeys.count(postId) });
-			queryClient.invalidateQueries({ queryKey: likeKeys.status(postId) });
+			queryClient.invalidateQueries({
+				queryKey: likeKeys.post(postId),
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: postKeys.published(),
+			});
 		},
 		onError: handleApiError,
 	});

@@ -74,10 +74,10 @@ type BookmarkPostResponse = {
 };
 
 type UserPostStatsResponse = {
-	count: {
-		posts: number;
-		likes: number;
-		comments: number;
+	stats: {
+		publishedPosts: number;
+		likesReceived: number;
+		commentsReceived: number;
 	};
 };
 
@@ -161,15 +161,26 @@ export const postsApi = {
 
 export const postKeys = {
 	all: ["posts"] as const,
-	published: (filters: FetchPostsFilters) =>
-		[...postKeys.all, "published", filters] as const,
+
+	published: () => [...postKeys.all, "published"] as const,
+
+	publishedList: (filters: FetchPostsFilters) =>
+		[...postKeys.published(), filters] as const,
+
 	user: (username: string) => [...postKeys.all, "user", username] as const,
+
+	me: () => [...postKeys.all, "me"] as const,
+
 	myPosts: (filters: FetchPostsFilters & { status?: PostStatus }) =>
-		[...postKeys.all, "me", filters] as const,
+		[...postKeys.me(), "list", filters] as const,
+
+	userStats: () => [...postKeys.me(), "stats"] as const,
+
 	bookmarks: () => [...postKeys.all, "bookmarks"] as const,
-	post: (slug: string) => ["post", slug] as const,
-	postById: (id: string) => ["post", id] as const,
-	userStats: (username: string) => ["stats", username] as const,
+
+	post: (slug: string) => [...postKeys.all, "detail", slug] as const,
+
+	postById: (id: string) => [...postKeys.all, "by-id", id] as const,
 };
 
 export const fetchPostsQueryOptions = ({
@@ -180,7 +191,7 @@ export const fetchPostsQueryOptions = ({
 	limit = 10,
 }: FetchPostsFilters) =>
 	infiniteQueryOptions({
-		queryKey: postKeys.published({ category, tag, search, sort, limit }),
+		queryKey: postKeys.publishedList({ category, tag, search, sort, limit }),
 		queryFn: ({ pageParam = 1 }) =>
 			postsApi.fetchPosts({
 				page: pageParam,
@@ -252,9 +263,9 @@ export const fetchBookmarksQueryOptions = () =>
 		staleTime: QueryStaleTime,
 	});
 
-export const fetchUserPostStatsQueryOptions = (username: string) =>
+export const fetchUserPostStatsQueryOptions = () =>
 	queryOptions({
-		queryKey: postKeys.userStats(username),
+		queryKey: postKeys.userStats(),
 		queryFn: () => postsApi.userStats(),
 		staleTime: QueryStaleTime,
 	});
@@ -275,9 +286,11 @@ export function useCreatePost() {
 export function useBookmarkPost() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (postId: string) => postsApi.bookmarkPost(postId),
+		mutationFn: postsApi.bookmarkPost,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: postKeys.bookmarks() });
+			queryClient.invalidateQueries({
+				queryKey: postKeys.bookmarks(),
+			});
 			toast.success("Post added to bookmarks");
 		},
 		onError: handleApiError,
@@ -287,9 +300,11 @@ export function useBookmarkPost() {
 export function useUnBookmarkPost() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (postId: string) => postsApi.unbookmarkPost(postId),
+		mutationFn: postsApi.unbookmarkPost,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: postKeys.bookmarks() });
+			queryClient.invalidateQueries({
+				queryKey: postKeys.bookmarks(),
+			});
 			toast.success("Post removed from bookmarks");
 		},
 		onError: handleApiError,
@@ -306,11 +321,8 @@ export function useUpdatePost() {
 			postId: string;
 			input: UpdatePostInput;
 		}) => postsApi.updatePost(postId, input),
-		onSuccess: async (_data, { postId }) => {
-			await Promise.all([
-				queryClient.invalidateQueries({ queryKey: postKeys.postById(postId) }),
-				queryClient.invalidateQueries({ queryKey: postKeys.all }),
-			]);
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: postKeys.all });
 		},
 		onError: handleApiError,
 	});
