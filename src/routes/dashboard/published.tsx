@@ -1,4 +1,3 @@
-import { userQueryOptions } from "@/api/authApi";
 import {
 	fetchMyPostsQueryOptions,
 	fetchUserPostStatsQueryOptions,
@@ -7,6 +6,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { defaultBlogSearch } from "@/constants";
 import { POST_STATUS, type Post } from "@/constants/types";
 import {
 	CalendarBlankIcon,
@@ -30,15 +30,11 @@ export const Route = createFileRoute("/dashboard/published")({
 });
 
 function RouteComponent() {
-	const userQuery = useQuery(userQueryOptions());
-
 	const postsQuery = useSuspenseInfiniteQuery(
 		fetchMyPostsQueryOptions({ status: POST_STATUS.PUBLISHED }),
 	);
 
-	const statsQuery = useQuery(
-		fetchUserPostStatsQueryOptions(userQuery.data?.user.username),
-	);
+	const statsQuery = useQuery(fetchUserPostStatsQueryOptions());
 
 	const { ref, inView } = useInView();
 
@@ -80,7 +76,7 @@ function RouteComponent() {
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
-							{statsQuery.data?.count.posts}
+							{statsQuery.data?.stats.publishedPosts}
 						</div>
 					</CardContent>
 				</Card>
@@ -93,7 +89,7 @@ function RouteComponent() {
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
-							{statsQuery.data?.count.likes}
+							{statsQuery.data?.stats.likesReceived}
 						</div>
 					</CardContent>
 				</Card>
@@ -106,7 +102,7 @@ function RouteComponent() {
 					</CardHeader>
 					<CardContent>
 						<div className="text-2xl font-bold">
-							{statsQuery.data?.count.comments}
+							{statsQuery.data?.stats.commentsReceived}
 						</div>
 					</CardContent>
 				</Card>
@@ -131,41 +127,42 @@ function RouteComponent() {
 											</p>
 										</div>
 
-										<div className="flex items-center gap-4 text-sm text-muted-foreground">
-											<div className="flex items-center gap-1">
-												<CalendarBlankIcon size={20} />
-												{new Date(post.createdAt).toLocaleDateString()}
-											</div>
-											<div className="flex items-center gap-1">
-												<EyeIcon size={20} />
-												{32} views
-											</div>
+										<div className="flex items-center gap-1 text-sm text-muted-foreground">
+											<CalendarBlankIcon size={20} />
+											{new Date(post.createdAt).toLocaleDateString()}
 										</div>
 
 										<div className="flex flex-wrap gap-2">
 											{post?.categories?.map((cat) => (
-												<Badge
+												<Link
+													to="/posts/search"
 													key={cat.id}
-													variant="secondary"
-													className="text-xs"
+													search={{ ...defaultBlogSearch, category: cat.name }}
 												>
-													{cat.name}
-												</Badge>
+													<Badge variant="secondary" className="text-xs">
+														{cat.name}
+													</Badge>
+												</Link>
 											))}
 											{post?.tags?.map((tag) => (
-												<Badge
+												<Link
 													key={tag.id}
-													variant="outline"
-													className="text-xs"
+													to="/posts/search"
+													search={{
+														...defaultBlogSearch,
+														tag: tag.name,
+													}}
 												>
-													#{tag.name}
-												</Badge>
+													<Badge variant="outline" className="text-xs">
+														#{tag.name}
+													</Badge>
+												</Link>
 											))}
 										</div>
 									</div>
 
 									<div className="flex items-center gap-2">
-										<Link to="/posts/$slug" params={{ slug: post?.slug }}>
+										<Link to="/posts/$slug" params={{ slug: post.slug }}>
 											<Button
 												variant="outline"
 												size="sm"
@@ -175,7 +172,7 @@ function RouteComponent() {
 												View
 											</Button>
 										</Link>
-										<Link to="/posts/edit/$id" params={{ id: post?.id }}>
+										<Link to="/posts/edit/$id" params={{ id: post.id }}>
 											<Button
 												variant="outline"
 												size="sm"

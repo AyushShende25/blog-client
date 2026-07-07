@@ -73,3 +73,10 @@ export const socialLinksMap: Record<Platform, Icon> = {
 };
 
 export const QueryStaleTime = 5 * 60 * 1000;
+
+export const defaultBlogSearch = {
+	search: "",
+	category: "",
+	tag: "",
+	sort: "publishedAt:desc",
+} as const;

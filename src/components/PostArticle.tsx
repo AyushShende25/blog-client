@@ -15,6 +15,8 @@ import {
 	useCreateLike,
 	useRemoveLike,
 } from "@/api/likesApi";
+import { Link } from "@tanstack/react-router";
+import { defaultBlogSearch } from "@/constants";
 
 type PostArticleProps = {
 	post: Post;
@@ -69,7 +71,7 @@ function PostArticle({ post, user }: PostArticleProps) {
 				<div className="flex items-center gap-4">
 					<div>
 						<Avatar size="lg">
-							<AvatarImage src={post.author?.avatar ?? ""} />
+							<AvatarImage src={post.author?.avatar ?? "/default-avatar.png"} />
 							<AvatarFallback>{post.author?.username}</AvatarFallback>
 						</Avatar>
 					</div>
@@ -121,14 +123,29 @@ function PostArticle({ post, user }: PostArticleProps) {
 					<span className="text-lg">{likeCountQuery.data?.count}</span>
 				</div>
 				{post.categories.map((c) => (
-					<Badge className="cursor-pointer" variant="secondary" key={c.id}>
-						{c.name}
-					</Badge>
+					<Link
+						to="/posts/search"
+						key={c.id}
+						search={{ ...defaultBlogSearch, category: c.name }}
+					>
+						<Badge className="cursor-pointer" variant="secondary">
+							{c.name}
+						</Badge>
+					</Link>
 				))}
 				{post.tags.map((t) => (
-					<Badge className="cursor-pointer" variant="outline" key={t.id}>
-						#{t.name}
-					</Badge>
+					<Link
+						key={t.id}
+						to="/posts/search"
+						search={{
+							...defaultBlogSearch,
+							tag: t.name,
+						}}
+					>
+						<Badge className="cursor-pointer" variant="outline">
+							#{t.name}
+						</Badge>
+					</Link>
 				))}
 			</div>
 		</article>

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import Logo from "@/components/Logo";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { useLogout, userQueryOptions } from "@/api/authApi";
 import { MagnifyingGlassIcon, XCircleIcon } from "@phosphor-icons/react";
 import type { User } from "@/constants/types";
+import { defaultBlogSearch } from "@/constants";
 
 function Header() {
 	const [isSearchBannerOpen, setIsSearchBannerOpen] = useState(false);
@@ -131,10 +132,10 @@ function SearchBanner({
 		if (e.key === "Enter") {
 			navigate({
 				to: "/posts/search",
-				search: (prev) => ({
-					...prev,
+				search: {
+					...defaultBlogSearch,
 					search: searchQuery,
-				}),
+				},
 			});
 			onSearchBannerChange(false);
 		}
@@ -160,7 +161,7 @@ function SearchBanner({
                        bg-transparent
                        text-2xl md:text-3xl
                        font-semibold
-                       placeholder:text-muted-foreground/70 placeholder:text-sm md:placeholder:text-lg"
+                       placeholder:text-muted-foreground/70 placeholder:text-sm md:placeholder:text-lg dark:bg-transparent"
 						autoFocus
 						onKeyDown={handleKeyPress}
 					/>
