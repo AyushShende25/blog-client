@@ -50,7 +50,6 @@ function RouteComponent() {
 			fetchNextPage();
 		}
 	}, [fetchNextPage, hasNextPage, inView]);
-	console.log(data);
 
 	const handleSortChange = (val: string) => {
 		navigate({

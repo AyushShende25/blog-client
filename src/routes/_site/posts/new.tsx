@@ -228,7 +228,7 @@ function RouteComponent() {
 				<form.Subscribe
 					selector={(state) => [state.canSubmit, state.isSubmitting]}
 					children={([canSubmit, isSubmitting]) => (
-						<div className="flex gap-4">
+						<div className="flex gap-4 w-full justify-end">
 							<Button
 								type="button"
 								size="lg"

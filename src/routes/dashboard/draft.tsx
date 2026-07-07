@@ -92,7 +92,7 @@ function RouteComponent() {
 								</div>
 
 								<div className="flex items-center gap-2">
-									<Link to="/posts/edit/$id" params={{ id: draft?.id }}>
+									<Link to="/posts/edit/$id" params={{ id: draft.id }}>
 										<Button
 											variant="outline"
 											size="sm"
@@ -141,7 +141,7 @@ function RouteComponent() {
 							Start writing your first draft to see it here
 						</p>
 						<Link to="/posts/new">
-							<Button size={"lg"} className="cursor-pointer">
+							<Button size="lg" className="cursor-pointer">
 								Create New Draft
 							</Button>
 						</Link>

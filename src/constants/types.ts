@@ -116,8 +116,6 @@ export type Media = {
 
 export type Platform = "github" | "twitter" | "linkedin";
 
-export type SavedPost = Omit<Post, "author" | "categories">;
-
 export type Comment = {
 	id: string;
 	content: string;
@@ -127,7 +125,6 @@ export type Comment = {
 	parentId: string | null;
 	createdAt: Date;
 	updatedAt: Date;
-
 	username: string;
 	avatar: string | undefined;
 	replies: Comment[];

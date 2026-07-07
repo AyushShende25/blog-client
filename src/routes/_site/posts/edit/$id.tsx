@@ -64,7 +64,6 @@ function RouteComponent() {
 							: value.coverImage;
 
 					const mediaIds = extractMediaIds(value.content ?? "");
-					console.log(mediaIds, "mids");
 
 					await updatePostMutation.mutateAsync({
 						postId: post.id,
@@ -231,7 +230,7 @@ function RouteComponent() {
 				<form.Subscribe
 					selector={(state) => [state.canSubmit, state.isSubmitting]}
 					children={([canSubmit, isSubmitting]) => (
-						<div className="space-x-4">
+						<div className="flex gap-4 w-full justify-end">
 							<Button
 								type="button"
 								size="lg"
@@ -260,19 +259,6 @@ function RouteComponent() {
 									Save Draft
 								</Button>
 							) : null}
-
-							<Button
-								type="reset"
-								variant="outline"
-								size="lg"
-								className="cursor-pointer"
-								onClick={(e) => {
-									e.preventDefault();
-									form.reset();
-								}}
-							>
-								Reset
-							</Button>
 						</div>
 					)}
 				/>
