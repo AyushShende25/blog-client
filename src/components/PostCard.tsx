@@ -4,18 +4,11 @@ import type { Post } from "@/constants/types";
 import { Separator } from "./ui/separator";
 import { ChatCircleDotsIcon, HeartIcon } from "@phosphor-icons/react";
 import { dateFormatter } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { fetchLikesCountQueryOptions } from "@/api/likesApi";
-import { fetchPostCommentsCountQueryOptions } from "@/api/commentsApi";
 
 function PostCard({ postData }: { postData: Post }) {
 	const formattedDate = postData.publishedAt
 		? dateFormatter.format(new Date(postData.publishedAt))
 		: null;
-	const likeCountQuery = useQuery(fetchLikesCountQueryOptions(postData.id));
-	const commentsCountQuery = useQuery(
-		fetchPostCommentsCountQueryOptions(postData.id),
-	);
 	return (
 		<Card className="group overflow-hidden h-full  border border-border/50 bg-card transition-all duration-300 hover:shadow-2xl hover:shadow-black/10 hover:-translate-y-1.5 hover:border-border py-0 ">
 			{/* Cover Image */}
@@ -68,7 +61,7 @@ function PostCard({ postData }: { postData: Post }) {
 					<div className="flex items-center gap-2.5">
 						<div className="relative">
 							<img
-								src={postData.author?.avatar ?? "/user2.jpg"}
+								src={postData.author?.avatar ?? "/default-avatar.png"}
 								alt={postData.author?.username ?? "Author"}
 								className="size-7 rounded-full object-cover ring-2 ring-background"
 							/>
@@ -89,11 +82,11 @@ function PostCard({ postData }: { postData: Post }) {
 					<div className="flex items-center gap-3 text-muted-foreground">
 						<div className="flex items-center gap-1 text-[11px]">
 							<HeartIcon size={20} />
-							<span>{likeCountQuery.data?.count}</span>
+							<span>{postData._count.likes}</span>
 						</div>
 						<div className="flex items-center gap-1 text-[11px]">
 							<ChatCircleDotsIcon size={20} />
-							<span>{commentsCountQuery.data?.count.totalComments}</span>
+							<span>{postData._count.comments}</span>
 						</div>
 					</div>
 				</div>
