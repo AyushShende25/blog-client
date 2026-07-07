@@ -55,7 +55,7 @@ function CommentSection({ post, user }: CommentSectionProps) {
 					<div className="space-y-4">
 						<div className="flex items-center gap-2">
 							<Avatar>
-								<AvatarImage src={user?.avatar ?? ""} />
+								<AvatarImage src={user?.avatar ?? "/default-avatar.png"} />
 								<AvatarFallback>{user?.username}</AvatarFallback>
 							</Avatar>
 							<p>{user?.username}</p>

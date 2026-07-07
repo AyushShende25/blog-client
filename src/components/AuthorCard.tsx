@@ -35,7 +35,7 @@ function AuthorCard({ post, user }: AuthorCardProps) {
 	return (
 		<div className="flex gap-4">
 			<Avatar size="lg">
-				<AvatarImage src={post.author?.avatar ?? ""} />
+				<AvatarImage src={post.author?.avatar ?? "/default-avatar.png"} />
 				<AvatarFallback>{post.author?.username}</AvatarFallback>
 			</Avatar>
 			<div className="flex-1">

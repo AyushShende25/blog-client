@@ -71,7 +71,11 @@ function CommentItem({ comment, post, currentUser }: CommentItemProps) {
 				<div className="flex gap-3">
 					<Avatar>
 						<AvatarImage
-							src={comment.isDeleted ? "/deleted.png" : comment.avatar}
+							src={
+								comment.isDeleted
+									? "/deleted.png"
+									: (comment.avatar ?? "/default-avatar.png")
+							}
 						/>
 						<AvatarFallback>
 							{comment.isDeleted ? "[deleted]" : comment.username}
