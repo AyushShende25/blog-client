@@ -92,70 +92,26 @@ function RouteComponent() {
 				<h1 className="text-3xl font-semibold py-2">Create New Post</h1>
 			</div>
 			<form
-				id="create-post-form"
-				className="bg-accent px-4 py-4 rounded-md md:px-10 md:py-8 mb-4"
 				onSubmit={(e) => {
 					e.preventDefault();
 					form.handleSubmit();
 				}}
 			>
-				<FieldGroup>
-					<form.Field
-						name="coverImage"
-						children={(field) => {
-							const isInvalid =
-								field.state.meta.isTouched && !field.state.meta.isValid;
-							return (
-								<Field className="w-fit" data-invalid={isInvalid}>
-									<CoverImageInput
-										value={field.state.value}
-										onChange={field.handleChange}
-										onBlur={field.handleBlur}
-									/>
-
-									{isInvalid && <FieldError errors={field.state.meta.errors} />}
-								</Field>
-							);
-						}}
-					/>
-					<form.Field
-						name="title"
-						children={(field) => {
-							const isInvalid =
-								field.state.meta.isTouched && !field.state.meta.isValid;
-							return (
-								<Field data-invalid={isInvalid}>
-									<Input
-										id={field.name}
-										name={field.name}
-										value={field.state.value}
-										onBlur={field.handleBlur}
-										onChange={(e) => field.handleChange(e.target.value)}
-										aria-invalid={isInvalid}
-										placeholder="New Post Title..."
-										autoComplete="off"
-										className="border-none focus-visible:ring-0 text-3xl md:text-5xl px-0 shadow-none cursor-text h-full dark:bg-transparent"
-									/>
-									{isInvalid && <FieldError errors={field.state.meta.errors} />}
-								</Field>
-							);
-						}}
-					/>
-					<div className="flex flex-col md:flex-row gap-3 md:gap-6 items-center">
+				<div className="bg-accent px-4 py-4 rounded-md md:px-10 md:py-8 mb-4">
+					<FieldGroup>
 						<form.Field
-							name="categories"
+							name="coverImage"
 							children={(field) => {
 								const isInvalid =
 									field.state.meta.isTouched && !field.state.meta.isValid;
 								return (
-									<Field data-invalid={isInvalid}>
-										<MultiSelect
-											options={categoriesQuery.data?.categories ?? []}
-											value={field.state.value ?? []}
+									<Field className="w-fit" data-invalid={isInvalid}>
+										<CoverImageInput
+											value={field.state.value}
 											onChange={field.handleChange}
-											placeholder="Select categories"
-											searchPlaceholder="Search categories..."
+											onBlur={field.handleBlur}
 										/>
+
 										{isInvalid && (
 											<FieldError errors={field.state.meta.errors} />
 										)}
@@ -164,25 +120,22 @@ function RouteComponent() {
 							}}
 						/>
 						<form.Field
-							name="tags"
+							name="title"
 							children={(field) => {
 								const isInvalid =
 									field.state.meta.isTouched && !field.state.meta.isValid;
 								return (
 									<Field data-invalid={isInvalid}>
-										<MultiSelect
-											options={tagsQuery.data?.tags ?? []}
-											value={field.state.value ?? []}
-											onChange={field.handleChange}
-											onCreateOption={async (name) => {
-												const { tag } = await createTagMutation.mutateAsync({
-													name,
-												});
-
-												return tag;
-											}}
-											placeholder="Select tags"
-											searchPlaceholder="Search tags..."
+										<Input
+											id={field.name}
+											name={field.name}
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={(e) => field.handleChange(e.target.value)}
+											aria-invalid={isInvalid}
+											placeholder="New Post Title..."
+											autoComplete="off"
+											className="border-none focus-visible:ring-0 text-3xl md:text-5xl px-0 shadow-none cursor-text h-full dark:bg-transparent"
 										/>
 										{isInvalid && (
 											<FieldError errors={field.state.meta.errors} />
@@ -191,74 +144,126 @@ function RouteComponent() {
 								);
 							}}
 						/>
-					</div>
+						<div className="flex flex-col md:flex-row gap-3 md:gap-6 items-center">
+							<form.Field
+								name="categories"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									return (
+										<Field data-invalid={isInvalid}>
+											<MultiSelect
+												options={categoriesQuery.data?.categories ?? []}
+												value={field.state.value ?? []}
+												onChange={field.handleChange}
+												placeholder="Select categories"
+												searchPlaceholder="Search categories..."
+											/>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
+							<form.Field
+								name="tags"
+								children={(field) => {
+									const isInvalid =
+										field.state.meta.isTouched && !field.state.meta.isValid;
+									return (
+										<Field data-invalid={isInvalid}>
+											<MultiSelect
+												options={tagsQuery.data?.tags ?? []}
+												value={field.state.value ?? []}
+												onChange={field.handleChange}
+												onCreateOption={async (name) => {
+													const { tag } = await createTagMutation.mutateAsync({
+														name,
+													});
 
-					<form.Field
-						name="content"
-						children={(field) => {
-							const isInvalid =
-								field.state.meta.isTouched && !field.state.meta.isValid;
-							return (
-								<Field data-invalid={isInvalid}>
-									<Editor
-										value={field.state.value}
-										onChange={field.handleChange}
-									/>
-
-									{isInvalid && <FieldError errors={field.state.meta.errors} />}
-								</Field>
-							);
-						}}
-					/>
-				</FieldGroup>
-			</form>
-			<form.Subscribe
-				selector={(state) => [state.errorMap]}
-				children={([errorMap]) =>
-					errorMap.onSubmit ? (
-						<div>
-							<em className="text-destructive font-light">
-								Form-Error: {errorMap.onSubmit}
-							</em>
+													return tag;
+												}}
+												placeholder="Select tags"
+												searchPlaceholder="Search tags..."
+											/>
+											{isInvalid && (
+												<FieldError errors={field.state.meta.errors} />
+											)}
+										</Field>
+									);
+								}}
+							/>
 						</div>
-					) : null
-				}
-			/>
-			<div className="flex gap-4">
+
+						<form.Field
+							name="content"
+							children={(field) => {
+								const isInvalid =
+									field.state.meta.isTouched && !field.state.meta.isValid;
+								return (
+									<Field data-invalid={isInvalid}>
+										<Editor
+											value={field.state.value}
+											onChange={field.handleChange}
+										/>
+
+										{isInvalid && (
+											<FieldError errors={field.state.meta.errors} />
+										)}
+									</Field>
+								);
+							}}
+						/>
+					</FieldGroup>
+				</div>
+
 				<form.Subscribe
-					selector={(state) => [state.canSubmit, state.isSubmitting]}
-					children={([canSubmit, isSubmitting]) => (
-						<div className="flex gap-4 w-full justify-end">
-							<Button
-								type="button"
-								size="lg"
-								className="cursor-pointer"
-								disabled={!canSubmit || isSubmitting}
-								onClick={() => {
-									form.setFieldValue("status", POST_STATUS.PUBLISHED);
-									form.handleSubmit();
-								}}
-							>
-								Publish
-							</Button>
-
-							<Button
-								type="button"
-								size="lg"
-								variant="outline"
-								className="cursor-pointer"
-								disabled={!canSubmit || isSubmitting}
-								onClick={() => {
-									form.setFieldValue("status", POST_STATUS.DRAFT);
-									form.handleSubmit();
-								}}
-							>
-								Save Draft
-							</Button>
-						</div>
-					)}
+					selector={(state) => [state.errorMap]}
+					children={([errorMap]) =>
+						errorMap.onSubmit ? (
+							<div>
+								<em className="text-destructive font-light">
+									Form-Error: {errorMap.onSubmit}
+								</em>
+							</div>
+						) : null
+					}
 				/>
-			</div>
+				<div className="flex gap-4">
+					<form.Subscribe
+						selector={(state) => [state.canSubmit, state.isSubmitting]}
+						children={([canSubmit, isSubmitting]) => (
+							<div className="flex gap-4 w-full justify-end">
+								<Button
+									type="submit"
+									size="lg"
+									className="cursor-pointer"
+									disabled={!canSubmit || isSubmitting}
+									onClick={() => {
+										form.setFieldValue("status", POST_STATUS.PUBLISHED);
+									}}
+								>
+									Publish
+								</Button>
+
+								<Button
+									type="submit"
+									size="lg"
+									variant="outline"
+									className="cursor-pointer"
+									disabled={!canSubmit || isSubmitting}
+									onClick={() => {
+										form.setFieldValue("status", POST_STATUS.DRAFT);
+									}}
+								>
+									Save Draft
+								</Button>
+							</div>
+						)}
+					/>
+				</div>
+			</form>
 		</main>
 	);
 }

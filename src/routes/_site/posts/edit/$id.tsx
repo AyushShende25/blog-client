@@ -232,13 +232,12 @@ function RouteComponent() {
 					children={([canSubmit, isSubmitting]) => (
 						<div className="flex gap-4 w-full justify-end">
 							<Button
-								type="button"
+								type="submit"
 								size="lg"
 								className="cursor-pointer"
 								disabled={!canSubmit || isSubmitting}
 								onClick={() => {
 									form.setFieldValue("status", POST_STATUS.PUBLISHED);
-									form.handleSubmit();
 								}}
 							>
 								{post.status === POST_STATUS.PUBLISHED ? "Update" : "Publish"}
@@ -246,14 +245,13 @@ function RouteComponent() {
 
 							{post.status === POST_STATUS.DRAFT ? (
 								<Button
-									type="button"
+									type="submit"
 									size="lg"
 									variant="outline"
 									className="cursor-pointer"
 									disabled={!canSubmit || isSubmitting}
 									onClick={() => {
 										form.setFieldValue("status", POST_STATUS.DRAFT);
-										form.handleSubmit();
 									}}
 								>
 									Save Draft

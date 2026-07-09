@@ -80,3 +80,5 @@ export const defaultBlogSearch = {
 	tag: "",
 	sort: "publishedAt:desc",
 } as const;
+
+export const AVATAR_MAX_SIZE = 5 * 1024 * 1024;

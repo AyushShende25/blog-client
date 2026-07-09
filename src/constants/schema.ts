@@ -72,7 +72,7 @@ export const updatePostFormSchema = z.object({
 export type UpdatePostFormInput = z.infer<typeof updatePostFormSchema>;
 
 export const updateMeFormSchema = z.object({
-	bio: z.string().trim().max(300).optional(),
+	bio: z.string().trim().max(300, "bio can be max 300 chars long").optional(),
 	socialLinks: z
 		.array(
 			z.object({
@@ -81,7 +81,12 @@ export const updateMeFormSchema = z.object({
 			}),
 		)
 		.optional(),
-	username: z.string().trim().min(3).max(30).optional(),
+	username: z
+		.string()
+		.trim()
+		.min(3, "username must be 3 or more chars")
+		.max(30, "username can be max 30 chars long")
+		.optional(),
 });
 
 export type UpdateMeFormInput = z.infer<typeof updateMeFormSchema>;
