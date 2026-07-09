@@ -3,13 +3,13 @@ import { socialLinksMap } from "@/constants";
 import { type Platform, ROLES, type User } from "@/constants/types";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
-import { useUpdateMe } from "@/api/userApi";
+import { useDeleteMe, useUpdateMe } from "@/api/userApi";
 import { useForm } from "@tanstack/react-form";
 import { type UpdateMeFormInput, updateMeFormSchema } from "@/constants/schema";
 import { getApiErrorMessage } from "@/lib/utils";
 import { Field, FieldError } from "@/components/ui/field";
 import { Textarea } from "./ui/textarea";
-import { XIcon } from "@phosphor-icons/react";
+import { TrashIcon, XIcon } from "@phosphor-icons/react";
 import { Input } from "./ui/input";
 
 function ProfileCard({
@@ -26,6 +26,7 @@ function ProfileCard({
 	onSuccess: () => void;
 }) {
 	const updateMeMutation = useUpdateMe();
+	const deleteMeMutation = useDeleteMe();
 
 	const form = useForm({
 		defaultValues: {
@@ -297,7 +298,17 @@ function ProfileCard({
 					)}
 				/>
 			) : (
-				<div className="mt-6 flex justify-end gap-3">
+				<div className="mt-6 flex justify-between items-center gap-3">
+					<Button
+						className="cursor-pointer"
+						onClick={() => deleteMeMutation.mutate()}
+						size="lg"
+						variant="destructive"
+						type="button"
+					>
+						<TrashIcon />
+						<span>Delete Account</span>
+					</Button>
 					<Button
 						size="lg"
 						type="button"
