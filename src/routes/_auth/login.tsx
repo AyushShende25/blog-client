@@ -16,14 +16,18 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { authSearchParamsSchema, loginFormSchema } from "@/constants/schema";
+import {
+	authSearchParamsSchema,
+	type LoginFormInput,
+	loginFormSchema,
+} from "@/constants/schema";
 import {
 	Field,
 	FieldError,
 	FieldGroup,
 	FieldLabel,
 } from "@/components/ui/field";
-import { isAxiosError } from "axios";
+import { getApiErrorMessage } from "@/lib/utils";
 
 export const Route = createFileRoute("/_auth/login")({
 	component: LoginComponent,
@@ -43,44 +47,33 @@ function LoginComponent() {
 
 	const form = useForm({
 		defaultValues: {
-			email: "test@test.com",
-			password: "test1234",
-		},
+			email: "",
+			password: "",
+		} as LoginFormInput,
 		validators: {
-			onSubmit: loginFormSchema,
-		},
-		onSubmit: async ({ value }) => {
-			try {
-				await loginMutation.mutateAsync(value);
-				await navigate({ to: search.redirect ?? "/" });
-			} catch (err: unknown) {
-				if (isAxiosError(err)) {
-					const data = err.response?.data;
-					if (Array.isArray(data)) {
-						form.setErrorMap({
-							onSubmit: {
-								form: data.map((m) => m.message).join(", "),
-								fields: {},
-							},
-						});
-					} else {
-						form.setErrorMap({
-							onSubmit: { form: data.message ?? "Login Failed", fields: {} },
-						});
-					}
-				} else {
-					form.setErrorMap({
-						onSubmit: { form: "Something went wrong", fields: {} },
-					});
+			onChange: loginFormSchema,
+			onSubmitAsync: async ({ value }) => {
+				try {
+					await loginMutation.mutateAsync(value);
+					await navigate({ to: search.redirect ?? "/" });
+					return null;
+				} catch (error) {
+					return getApiErrorMessage(error);
 				}
-			}
+			},
 		},
 	});
 
 	return (
 		<div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
 			<div className="w-full max-w-sm">
-				<div className="flex flex-col gap-6">
+				<form
+					onSubmit={(e) => {
+						e.preventDefault();
+						e.stopPropagation();
+						form.handleSubmit();
+					}}
+				>
 					<Card>
 						<CardHeader>
 							<CardTitle className="text-2xl">Login</CardTitle>
@@ -89,90 +82,86 @@ function LoginComponent() {
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<form
-								id="login-form"
-								onSubmit={(e) => {
-									e.preventDefault();
-									e.stopPropagation();
-									form.handleSubmit();
-								}}
-							>
-								<FieldGroup>
-									<form.Field
-										name="email"
-										children={(field) => {
-											const isInvalid =
-												field.state.meta.isTouched && !field.state.meta.isValid;
-											return (
-												<Field data-invalid={isInvalid}>
-													<FieldLabel htmlFor={field.name}>Email</FieldLabel>
-													<Input
-														id={field.name}
-														type="email"
-														name={field.name}
-														value={field.state.value}
-														onBlur={field.handleBlur}
-														onChange={(e) => field.handleChange(e.target.value)}
-														aria-invalid={isInvalid}
-														placeholder="m@example.com"
-														autoComplete="off"
-													/>
-													{isInvalid && (
-														<FieldError errors={field.state.meta.errors} />
-													)}
-												</Field>
-											);
-										}}
-									/>
-									<form.Field
-										name="password"
-										children={(field) => {
-											const isInvalid =
-												field.state.meta.isTouched && !field.state.meta.isValid;
-											return (
-												<Field data-invalid={isInvalid}>
-													<FieldLabel htmlFor={field.name}>Password</FieldLabel>
-													<Input
-														id={field.name}
-														type="password"
-														name={field.name}
-														value={field.state.value}
-														onBlur={field.handleBlur}
-														onChange={(e) => field.handleChange(e.target.value)}
-														aria-invalid={isInvalid}
-														autoComplete="off"
-													/>
-													{isInvalid && (
-														<FieldError errors={field.state.meta.errors} />
-													)}
-												</Field>
-											);
-										}}
-									/>
-								</FieldGroup>
-							</form>
+							<FieldGroup>
+								<form.Field
+									name="email"
+									children={(field) => {
+										const isInvalid =
+											field.state.meta.isTouched && !field.state.meta.isValid;
+										return (
+											<Field data-invalid={isInvalid}>
+												<FieldLabel htmlFor={field.name}>Email</FieldLabel>
+												<Input
+													id={field.name}
+													type="email"
+													name={field.name}
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													onChange={(e) => field.handleChange(e.target.value)}
+													aria-invalid={isInvalid}
+													placeholder="m@example.com"
+													autoComplete="off"
+												/>
+												{isInvalid && (
+													<FieldError errors={field.state.meta.errors} />
+												)}
+											</Field>
+										);
+									}}
+								/>
+								<form.Field
+									name="password"
+									children={(field) => {
+										const isInvalid =
+											field.state.meta.isTouched && !field.state.meta.isValid;
+										return (
+											<Field data-invalid={isInvalid}>
+												<FieldLabel htmlFor={field.name}>Password</FieldLabel>
+												<Input
+													id={field.name}
+													type="password"
+													name={field.name}
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													onChange={(e) => field.handleChange(e.target.value)}
+													aria-invalid={isInvalid}
+													autoComplete="off"
+												/>
+												{isInvalid && (
+													<FieldError errors={field.state.meta.errors} />
+												)}
+											</Field>
+										);
+									}}
+								/>
+							</FieldGroup>
 						</CardContent>
 						<CardFooter className="flex flex-col gap-4">
 							<form.Subscribe
 								selector={(state) => [state.errorMap]}
 								children={([errorMap]) =>
 									errorMap.onSubmit ? (
-										<p className="text-destructive  text-sm">
-											{`${errorMap.onSubmit}`}
-										</p>
+										<div>
+											<em className="text-destructive font-light">
+												Form-Error: {errorMap.onSubmit}
+											</em>
+										</div>
 									) : null
 								}
 							/>
-							<Field orientation="horizontal">
-								<Button
-									className="cursor-pointer w-full"
-									type="submit"
-									form="login-form"
-									disabled={loginMutation.isPending}
-								>
-									{loginMutation.isPending ? "Logging in..." : "Login"}
-								</Button>
-							</Field>
+							<form.Subscribe
+								selector={(state) => [state.canSubmit, state.isSubmitting]}
+								children={([canSubmit, isSubmitting]) => (
+									<Button
+										type="submit"
+										size="lg"
+										className="cursor-pointer w-full"
+										disabled={!canSubmit || isSubmitting}
+									>
+										{isSubmitting ? "Logging in..." : "Login"}
+									</Button>
+								)}
+							/>
 							<Field orientation="horizontal">
 								<div className="text-xs space-x-2">
 									<span>Don't have an account?</span>
@@ -183,7 +172,7 @@ function LoginComponent() {
 							</Field>
 						</CardFooter>
 					</Card>
-				</div>
+				</form>
 			</div>
 		</div>
 	);
