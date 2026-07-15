@@ -1,14 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import type { Post } from "@/constants/types";
-import { Separator } from "./ui/separator";
 import { ChatCircleDotsIcon, HeartIcon } from "@phosphor-icons/react";
-import { dateFormatter } from "@/lib/utils";
+import { getFormattedDate } from "@/lib/utils";
+import AuthorInfo from "./AuthorInfo";
 
 function PostCard({ postData }: { postData: Post }) {
-	const formattedDate = postData.publishedAt
-		? dateFormatter.format(new Date(postData.publishedAt))
-		: null;
 	return (
 		<Card className="group overflow-hidden h-full  border border-border/50 bg-card transition-all duration-300 hover:shadow-2xl hover:shadow-black/10 hover:-translate-y-1.5 hover:border-border py-0 ">
 			{/* Cover Image */}
@@ -38,7 +35,12 @@ function PostCard({ postData }: { postData: Post }) {
 				</div>
 			</Link>
 
-			<CardContent className="p-5 space-y-3">
+			<CardContent className=" space-y-3">
+				{postData.publishedAt && (
+					<p className="text-[11px] text-muted-foreground">
+						{getFormattedDate(postData.publishedAt)}
+					</p>
+				)}
 				<Link to="/posts/$slug" params={{ slug: postData.slug }}>
 					<h3 className="text-xl font-bold leading-snug line-clamp-2 cursor-pointer transition-colors duration-200 group-hover:text-primary">
 						{postData.title}
@@ -54,43 +56,21 @@ function PostCard({ postData }: { postData: Post }) {
 						<span key={t.id}>#{t.name}</span>
 					))}
 				</div>
+			</CardContent>
+			<CardFooter className="flex items-center justify-between">
+				{postData.author && <AuthorInfo author={postData.author} />}
 
-				<Separator />
-
-				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-2.5">
-						<div className="relative">
-							<img
-								src={postData.author?.avatar ?? "/default-avatar.png"}
-								alt={postData.author?.username ?? "Author"}
-								className="size-7 rounded-full object-cover ring-2 ring-background"
-							/>
-							<div className="absolute inset-0 rounded-full ring-1 ring-border/50" />
-						</div>
-						<div>
-							<p className="text-xs font-semibold text-foreground leading-none">
-								{postData.author?.username}
-							</p>
-							{formattedDate && (
-								<p className="text-[11px] text-muted-foreground mt-0.5">
-									{formattedDate}
-								</p>
-							)}
-						</div>
+				<div className="flex items-center gap-3 text-muted-foreground">
+					<div className="flex items-center gap-1 text-[11px]">
+						<HeartIcon size={20} />
+						<span>{postData._count.likes}</span>
 					</div>
-
-					<div className="flex items-center gap-3 text-muted-foreground">
-						<div className="flex items-center gap-1 text-[11px]">
-							<HeartIcon size={20} />
-							<span>{postData._count.likes}</span>
-						</div>
-						<div className="flex items-center gap-1 text-[11px]">
-							<ChatCircleDotsIcon size={20} />
-							<span>{postData._count.comments}</span>
-						</div>
+					<div className="flex items-center gap-1 text-[11px]">
+						<ChatCircleDotsIcon size={20} />
+						<span>{postData._count.comments}</span>
 					</div>
 				</div>
-			</CardContent>
+			</CardFooter>
 		</Card>
 	);
 }

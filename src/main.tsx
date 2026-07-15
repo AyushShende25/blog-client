@@ -7,7 +7,7 @@ import NotFound from '@/components/not-found';
 import ErrorComponent from '@/components/error-component';
 import BouncingLoader from '@/components/BouncingLoader';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({defaultOptions:{queries:{retry:false}}});
 
 const router = createRouter({
   routeTree,

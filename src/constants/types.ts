@@ -23,6 +23,7 @@ export type Post = {
 		username: string;
 		avatar: string | null;
 		bio: string | null;
+		status: UserStatus;
 	} | null;
 	_count: {
 		likes: number;
@@ -127,6 +128,7 @@ export type Comment = {
 	updatedAt: Date;
 	username: string;
 	avatar: string | undefined;
+	status: UserStatus;
 	replies: Comment[];
 };
 

@@ -11,8 +11,13 @@ import {
 	TrashIcon,
 	XIcon,
 } from "@phosphor-icons/react";
-import { dateFormatter } from "@/lib/utils";
-import type { Post, User, Comment } from "@/constants/types";
+import { getDisplayUsername, getFormattedDate } from "@/lib/utils";
+import {
+	type Post,
+	type User,
+	type Comment,
+	USER_STATUS,
+} from "@/constants/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
@@ -65,28 +70,34 @@ function CommentItem({ comment, post, currentUser }: CommentItemProps) {
 		deleteCommentMutation.mutate({ commentId: comment.id, postId: post.id });
 	};
 
+	const isDeletedUser = comment.status === USER_STATUS.DELETED;
+
+	const avatar =
+		comment.isDeleted || isDeletedUser
+			? "/deleted-avatar.png"
+			: (comment.avatar ?? "/default-avatar.png");
+
+	const displayUsername = getDisplayUsername({
+		username: comment.username,
+		status: comment.status,
+	});
+
 	return (
 		<div className="space-y-3">
 			<div className="flex gap-4 justify-between">
 				<div className="flex gap-3">
 					<Avatar>
-						<AvatarImage
-							src={
-								comment.isDeleted
-									? "/deleted.png"
-									: (comment.avatar ?? "/default-avatar.png")
-							}
-						/>
+						<AvatarImage src={avatar} />
 						<AvatarFallback>
-							{comment.isDeleted ? "[deleted]" : comment.username}
+							{comment.isDeleted ? "[deleted]" : displayUsername}
 						</AvatarFallback>
 					</Avatar>
 					<div>
 						<p className="font-semibold text-base leading-tight">
-							{comment.isDeleted ? "[deleted]" : comment.username}
+							{comment.isDeleted ? "[deleted]" : displayUsername}
 						</p>
 						<p className="text-xs text-muted-foreground">
-							{dateFormatter.format(new Date(comment.createdAt))}
+							{getFormattedDate(comment.createdAt.toString())}
 						</p>
 					</div>
 				</div>

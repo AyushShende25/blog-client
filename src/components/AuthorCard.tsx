@@ -8,6 +8,7 @@ import {
 	useFollow,
 	useUnfollow,
 } from "@/api/userApi";
+import AuthorInfo from "./AuthorInfo";
 
 type AuthorCardProps = {
 	post: Post;
@@ -33,33 +34,25 @@ function AuthorCard({ post, user }: AuthorCardProps) {
 		}
 	};
 	return (
-		<div className="flex gap-4">
-			<Avatar size="lg">
-				<AvatarImage src={post.author?.avatar ?? "/default-avatar.png"} />
-				<AvatarFallback>{post.author?.username}</AvatarFallback>
-			</Avatar>
-			<div className="flex-1">
-				<div className="flex justify-between">
-					<h4 className="font-semibold text-lg md:text-xl">
-						Written by {post.author?.username}
-					</h4>
-					{!isOwnPost && (
-						<Button
-							variant="outline"
-							className="cursor-pointer"
-							size="lg"
-							onClick={handleToggleFollow}
-						>
-							{isFollowingQuery.data?.isFollowing ? "Unfollow" : "Follow"}
-						</Button>
-					)}
+		<div className="space-y-2">
+			<div className="flex justify-between items-start">
+				<div className="space-y-4">
+					<h4 className="text-lg font-semibold md:text-xl">Written by</h4>
+					{post.author && <AuthorInfo author={post.author} />}
 				</div>
-				<p className="font-light text-muted-foreground space-x-4 text-sm">
-					<span>{authorStatsQuery.data?.followers} followers</span>
-					<span>{authorStatsQuery.data?.following} following</span>
-				</p>
-				<p className="mt-4">{post.author?.bio}</p>
+				{!isOwnPost && (
+					<Button variant="outline" size="lg" onClick={handleToggleFollow}>
+						{isFollowingQuery.data?.isFollowing ? "Unfollow" : "Follow"}
+					</Button>
+				)}
 			</div>
+
+			<div className="flex gap-4 text-sm font-light text-muted-foreground">
+				<span>{authorStatsQuery.data?.followers} followers</span>
+				<span>{authorStatsQuery.data?.following} following</span>
+			</div>
+
+			<p className="mt-4">{post.author?.bio}</p>
 		</div>
 	);
 }

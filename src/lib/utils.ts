@@ -2,7 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import axios from "axios";
 import { toast } from "sonner";
-import type { Comment } from "@/constants/types";
+import { USER_STATUS, type Comment, type UserStatus } from "@/constants/types";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -31,12 +31,6 @@ export const getApiErrorMessage = (err: unknown) => {
 export function handleApiError(err: unknown) {
 	toast.error(getApiErrorMessage(err));
 }
-
-export const dateFormatter = new Intl.DateTimeFormat("en-US", {
-	year: "numeric",
-	month: "short",
-	day: "numeric",
-});
 
 export const buildCommentsTree = (comments: Comment[]) => {
 	const map = new Map<string, Comment>();
@@ -71,4 +65,21 @@ export const extractMediaIds = (html: string): string[] => {
 	)
 		.map((image) => image.dataset.mediaId)
 		.filter((id): id is string => Boolean(id));
+};
+
+export const getDisplayUsername = (user: {
+	username: string;
+	status: UserStatus;
+}) => {
+	return user.status === USER_STATUS.DELETED ? "Deleted User" : user.username;
+};
+
+export const dateFormatter = new Intl.DateTimeFormat("en-US", {
+	year: "numeric",
+	month: "short",
+	day: "numeric",
+});
+
+export const getFormattedDate = (date: string) => {
+	return dateFormatter.format(new Date(date));
 };

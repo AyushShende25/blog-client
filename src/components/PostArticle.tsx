@@ -1,6 +1,5 @@
 import type { Post, User } from "@/constants/types";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { dateFormatter } from "@/lib/utils";
+import { getFormattedDate } from "@/lib/utils";
 import { BookmarkSimpleIcon, HeartIcon } from "@phosphor-icons/react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +16,7 @@ import {
 } from "@/api/likesApi";
 import { Link } from "@tanstack/react-router";
 import { defaultBlogSearch } from "@/constants";
+import AuthorInfo from "./AuthorInfo";
 
 type PostArticleProps = {
 	post: Post;
@@ -69,23 +69,16 @@ function PostArticle({ post, user }: PostArticleProps) {
 				</h1>
 
 				<div className="flex items-center gap-4">
-					<div>
-						<Avatar size="lg">
-							<AvatarImage src={post.author?.avatar ?? "/default-avatar.png"} />
-							<AvatarFallback>{post.author?.username}</AvatarFallback>
-						</Avatar>
-					</div>
 					<div className="w-full flex justify-between items-center">
-						<div>
-							<p>
-								By{" "}
-								<span className="font-semibold">{post.author?.username}</span>
-							</p>
+						<div className="space-y-2">
+							{post.author && <AuthorInfo author={post.author} />}
 							{post.publishedAt && (
-								<p>{dateFormatter.format(new Date(post.publishedAt))}</p>
+								<p className="text-[11px] text-muted-foreground">
+									{getFormattedDate(post.publishedAt)}
+								</p>
 							)}
 						</div>
-						<div className="flex gap-6">
+						<div>
 							{user && (
 								<button
 									type="button"
